@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1001146419026",
+    "firebase_url": "https://sugarhunter-afdee.firebaseio.com",
+    "project_id": "sugarhunter-afdee",
+    "storage_bucket": "sugarhunter-afdee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001146419026:android:3d548be5581de698",
+        "android_client_info": {
+          "package_name": "com.sh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1001146419026-nu37fsotmrjhv94bihnkr0c59f8qcbh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDY0SfTAgATyFk9NHLPqKcT3CYDnSDMHbs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
