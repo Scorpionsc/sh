@@ -1,46 +1,20 @@
-import React, {Component} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import palette from '../../palette';
-import firebase from 'react-native-firebase';
+import { StyleSheet } from 'react-native'
 
-import {
-    ActivityIndicator,
-    StyleSheet,
-    View,
-} from 'react-native'
-
-class Navigation extends Component {
+class Navigation extends React.Component {
     static propTypes = {
         authorized: PropTypes.bool.isRequired,
     };
 
-    constructor() {
-        super();
-
-        this.state = {
-            isLoading: true,
-        };
-
-
-
-    }
-
-    componentDidMount(){
-        console.log(300);
-    }
-
     render() {
 
-        const { isLoading } = this.state;
 
-        if(isLoading){
-            return <View style={[styles.preLoader]}>
-                <ActivityIndicator
-                    size="large"
-                    color={palette.color4} />
-            </View>;
-        }
-        return null;
+        return (<View style={[styles.container]}>
+           Sis
+        </View>);
+
     }
 }
 

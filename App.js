@@ -1,18 +1,17 @@
 import React from 'react';
 import {rootReducer} from "./source/store/rootReducer";
 import {Provider} from 'react-redux';
-import {createStore} from 'redux';
-import DrawerNav from './source/components/drawerNav';
-import NavigationContainer from "./source/navigation/containers/NavigationContainer";
+import {createStore, applyMiddleware} from 'redux';
+import MainContainer from "./source/main/containers/MainContainer";
+import thunk from 'redux-thunk'
 
-
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, applyMiddleware(thunk));
 
 export default class App extends React.Component {
     render() {
         return (
             <Provider store={store}>
-                <NavigationContainer />
+                <MainContainer />
             </Provider>
         );
     }

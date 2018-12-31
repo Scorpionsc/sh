@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "1001146419026-nc9g1hapf3siu5c2haom71mqisuh008j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sh",
+            "certificate_hash": "d0d67dbbcb8ab046a5b396f8c380ea020d1e29ef"
+          }
+        },
+        {
+          "client_id": "1001146419026-huvgrpcmron9oqrbjhd4lvp366vf0k6c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sh",
+            "certificate_hash": "fd21674ba12a945f78c34d649b07f83e5fd25c88"
+          }
+        },
+        {
           "client_id": "1001146419026-nu37fsotmrjhv94bihnkr0c59f8qcbh8.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +45,20 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1001146419026-nu37fsotmrjhv94bihnkr0c59f8qcbh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1001146419026-llre11stcpglc834ifh9ue4abck8ep3n.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sugar-hunter"
+              }
+            }
+          ]
         },
         "ads_service": {
           "status": 2

@@ -1,6 +1,8 @@
 import React from 'react';
 import {StyleSheet, View, Text, StatusBar} from 'react-native';
 import Styles from "./styles";
+import palette from "../../palette";
+import { GoogleSigninButton } from 'react-native-google-signin';
 
 class Auth extends React.Component {
 
@@ -27,12 +29,25 @@ class Auth extends React.Component {
                 translucent
             />
 
-            <View>
-                <Text>Auth</Text>
-            </View>
+            <GoogleSigninButton
+                style={{ width: 48, height: 48 }}
+                size={GoogleSigninButton.Size.Icon}
+                color={GoogleSigninButton.Color.Dark}
+                onPress={this._signIn}
+                disabled={this.state.isSigninInProgress} />
+
         </View>);
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: palette.color3,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+});
 
 
 export default Auth;
