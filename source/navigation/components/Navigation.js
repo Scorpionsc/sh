@@ -1,31 +1,19 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import palette from '../../palette';
-import { StyleSheet } from 'react-native'
+import {createStackNavigator} from "react-navigation";
+import HomeScreen from '../../screens/components/HomeScreen';
+import SettingsScreen from "../../screens/components/SettingsScreen";
 
-class Navigation extends React.Component {
-    static propTypes = {
-        authorized: PropTypes.bool.isRequired,
-    };
-
-    render() {
-
-
-        return (<View style={[styles.container]}>
-           Sis
-        </View>);
-
-    }
-}
-
-const styles = StyleSheet.create({
-    preLoader: {
-        flex: 1,
-        backgroundColor: palette.color3,
-        justifyContent: 'center',
-        alignItems: 'center',
+const AppNavigator = createStackNavigator({
+        Home: {
+            screen: HomeScreen,
+        },
+        Settings: {
+            screen: SettingsScreen,
+        },
     },
-});
+    {
+        initialRouteName: 'Home',
+    }
+);
 
 
-export default Navigation;
+export default AppNavigator;

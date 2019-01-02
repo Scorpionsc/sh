@@ -14,7 +14,6 @@ export const fetchData = () => {
         );
 
     }
-
 };
 
 const fetchUser = async () => {

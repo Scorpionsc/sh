@@ -37,14 +37,6 @@ class Main extends React.Component {
 
         this.props.fetchData();
 
-        //
-        // this.storageUser = null;
-        // this.dbUser = null;
-        // this.user = null;
-        // this.userRef = null;
-        // this.isDBUserFetched = false;
-        // this.isStorageUserFetched = false;
-
     }
 
     componentDidMount() {
@@ -60,93 +52,6 @@ class Main extends React.Component {
     handleConnectivityChange = (isConnected) => {
         this.setState({isConnected});
     };
-
-    //
-    //
-    // auth = async () => {
-    //     try {
-    //         await GoogleSignin.configure();
-    //
-    //         const data = await GoogleSignin.signIn();
-    //
-    //         const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken);
-    //
-    //         const currentUser = await firebase.auth().signInAndRetrieveDataWithCredential(credential);
-    //
-    //         return currentUser.user.toJSON();
-    //
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // };
-    //
-    // fetchData = (user) => {
-    //     this.user = user;
-    //
-    //     this.fetchLocalData();
-    //     this.fetchDBData();
-    //
-    // };
-    //
-    // fetchDBData = () => {
-    //     this.fetchDBUser();
-    // };
-    //
-    // fetchDBUser = () => {
-    //     this.userRef = firebase.database().ref(`users/${this.user.uid}`);
-    //     this.userRef.on('value', this.onUserChange);
-    // };
-    //
-    //
-    //
-    // onUserChange = (snapshot) => {
-    //
-    //     this.dbUser = snapshot.val();
-    //
-    //     this.isDBUserFetched = true;
-    //
-    //     if(this.isStorageUserFetched){
-    //
-    //         this.syncUser().then(this.setUserToStore);
-    //     }
-    //
-    // };
-    //
-    // renderContent = () => {
-    //     console.log();
-    //
-    //     return this.user.patient !== undefined ? <Navigation /> : <SocialSettingsContainer />;
-    // };
-    //
-    //
-    //
-    // setUserToDB(user){
-    //     this.userRef.set(user);
-    // }
-    //
-    // setUserToStore = (user) => {
-    //     const { setUser, userUpdatedAt, authorized, setAuthState } = this.props;
-    //
-    //     if( !userUpdatedAt || userUpdatedAt < user.updatedAt ){
-    //         setUser(user);
-    //         if( !authorized ) {
-    //             setAuthState(true);
-    //         }
-    //     }
-    //
-    // };
-    //
-    // setUserToStorage = async(user) => {
-    //     try {
-    //         await AsyncStorage.setItem(`@SHStore:${this.user.uid}`, JSON.stringify(user));
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
-    //
-    // unSubscribeDB = () => {
-    //     this.userRef.of('value', this.onUserChange);
-    // };
 
     renderOfflineMessage = () => {
         const {userUpdatedAt} = this.props;
@@ -164,10 +69,9 @@ class Main extends React.Component {
         return userUpdatedAt
             ? patient === null
                 ? <SocialSettingsContainer/>
-                : null
+                : <Navigation/>
             : <MainPreLoader/>
     };
-
 
     render() {
 
@@ -180,6 +84,7 @@ class Main extends React.Component {
         </View>);
 
     }
+
 }
 
 const styles = StyleSheet.create({
