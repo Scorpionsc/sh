@@ -10,15 +10,15 @@ import OfflineNotification from '../../notifications/components/offlineNotificat
 import {AsyncStorage} from 'react-native'
 import {GoogleSignin} from "react-native-google-signin";
 import firebase from "react-native-firebase";
-import Navigation from "../../navigation/components/Navigation";
+import Navigation from "../../navigation/Navigation";
 import SocialSettingsContainer from "../../settings/containers/SocialSettingsContainer";
 import palette from "../../palette";
+import AuthLoadingScreenContainer from "../containers/AuthLoadingScreenContainer";
 
-class Main extends React.Component {
+class AuthLoadingScreen extends React.Component {
 
     static propTypes = {
         userUpdatedAt: PropTypes.number,
-        patient: PropTypes.bool,
 
         fetchData: PropTypes.func.isRequired,
     };
@@ -32,6 +32,7 @@ class Main extends React.Component {
         isConnected: true
     };
 
+
     constructor(props) {
         super(props);
 
@@ -43,11 +44,26 @@ class Main extends React.Component {
 
         NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 
+        this.checkAuth();
+
     }
 
     componentWillUnmount() {
         NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
     }
+
+    componentDidUpdate() {
+        this.checkAuth();
+    }
+
+
+    checkAuth = () => {
+
+        const {userUpdatedAt} = this.props;
+
+        if( userUpdatedAt ) this.props.navigation.navigate('App');
+
+    };
 
     handleConnectivityChange = (isConnected) => {
         this.setState({isConnected});
@@ -62,16 +78,6 @@ class Main extends React.Component {
             : null;
     };
 
-    renderContent = () => {
-
-        const {userUpdatedAt, patient} = this.props;
-
-        return userUpdatedAt
-            ? patient === null
-                ? <SocialSettingsContainer/>
-                : <Navigation/>
-            : <MainPreLoader/>
-    };
 
     render() {
 
@@ -79,7 +85,7 @@ class Main extends React.Component {
 
             {this.renderOfflineMessage()}
 
-            {this.renderContent()}
+            <MainPreLoader/>
 
         </View>);
 
@@ -94,4 +100,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default Main;
+export default AuthLoadingScreen;

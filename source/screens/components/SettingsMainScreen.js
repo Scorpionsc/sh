@@ -7,17 +7,51 @@ import {
     Text,
     Image,
     ScrollView,
-    Switch
+    Switch,
+    TouchableNativeFeedback,
+    BackHandler,
 } from 'react-native';
 import { Platform } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-class SocialSettings extends React.Component {
+class SettingsMainScreen extends React.Component {
 
     static propTypes = {
         user: PropTypes.object.isRequired,
 
         setUser: PropTypes.func.isRequired,
+    };
+
+    static navigationOptions = ({ navigation, navigationOptions }) => {
+        const { params } = navigation.state;
+
+        return params.backButton
+            ? { title: 'Main Settings' }
+            : {
+                title: 'Main Settings',
+                headerLeft: null,
+                headerRight: (
+                    <View style={[styles.settingsHeadButtonWrap]}>
+                        <TouchableNativeFeedback
+                            onPress={params.handleSave}
+                            background={TouchableNativeFeedback.SelectableBackground()}
+                            borderRadius={20}
+                        >
+                            <View style={styles.settingsHeadButton}>
+                                <Icon
+                                    name={Platform.OS === "ios" ? "ios-checkmark" : "md-checkmark"}
+                                    color={palette.color2}
+                                    size={35}
+                                    onPress={this.saveSettings}
+                                />
+                            </View>
+
+                        </TouchableNativeFeedback>
+
+                    </View>
+                )
+            };
+
     };
 
 
@@ -27,8 +61,31 @@ class SocialSettings extends React.Component {
         this.state = {
             patient: props.user.patient === null ? false : props.user.patient,
         };
+
+        this.didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
 
+
+    componentDidMount() {
+        this.props.navigation.setParams({ handleSave: this.saveSettings });
+        this.willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
+    }
+
+    componentWillUnmount() {
+        this.didFocusSubscription && this.didFocusSubscription.remove();
+        this.willBlurSubscription && this.willBlurSubscription.remove();
+    }
+
+
+    onBackButtonPressAndroid = () => {
+        const {navigation} = this.props;
+
+        return !navigation.state.params.backButton;
+    };
 
     onPatientStatusChange = (status) => {
 
@@ -36,22 +93,6 @@ class SocialSettings extends React.Component {
             patient: status,
         });
 
-    };
-
-    renderHeader = () => {
-        return (<View style={[styles.settingsHead]}>
-            <View style={[styles.settingsHeadTitle]}>
-                <Text style={[styles.settingsTitle]} numberOfLines={1}>Social settings</Text>
-            </View>
-            <View style={[styles.settingsHeadButton]}>
-                <Icon
-                    name={Platform.OS === "ios" ? "ios-checkmark" : "md-checkmark"}
-                    color={palette.color1}
-                    size={35}
-                    onPress={this.saveSettings}
-                />
-            </View>
-        </View>);
     };
 
     renderPatientSelector = () => {
@@ -99,6 +140,8 @@ class SocialSettings extends React.Component {
             updatedAt: Date.now(),
             patient,
         } );
+
+        this.props.navigation.navigate('Home');
     };
 
 
@@ -106,12 +149,12 @@ class SocialSettings extends React.Component {
 
         return (<View style={[styles.settings]}>
 
-            { this.renderHeader() }
-
             <ScrollView style={[styles.settingsWrap]}>
+
                 {this.renderUserInfo()}
 
                 {this.renderPatientSelector()}
+
             </ScrollView>
 
         </View>);
@@ -137,12 +180,12 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     userName: {
-        color: palette.color1,
+        color: palette.color2,
         fontSize: 18,
         marginBottom: 5,
     },
     userEmail: {
-        color: palette.color1,
+        color: palette.color2,
         fontSize: 14,
     },
     settings: {
@@ -151,24 +194,24 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
     },
-    settingsHead: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingRight: 20,
-        paddingLeft: 20,
-        alignSelf: 'stretch',
-        height: 50,
-        backgroundColor: palette.color5,
-    },
-    settingsHeadTitle: {
+    settingsHeadButtonWrap: {
         flex: 1,
+        overflow: 'hidden',
+        marginRight: 10,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
     },
     settingsHeadButton: {
-        flex: 1,
-        alignItems: 'flex-end',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: palette.color5,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
     },
     settingsTitle: {
-        color: palette.color1,
+        color: palette.color2,
         fontSize: 20,
         lineHeight: 50,
     },
@@ -188,7 +231,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
     },
     settingsLabel: {
-        color: palette.color1,
+        color: palette.color2,
         fontSize: 20,
     },
     settingsLineWrap: {
@@ -196,4 +239,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SocialSettings;
+export default SettingsMainScreen;

@@ -75,8 +75,6 @@ const subscribeDBUser = (localUser, dispatch) => {
 
     const userRef = firebase.database().ref(`users/${localUser.uid}`);
 
-    console.log(userRef);
-
     dispatch(setUserRef(userRef));
 
     userRef.on('value', (snapshot) => {
@@ -96,9 +94,6 @@ const syncUser = async (localUser, dbUser, userRef) => {
     let user = localUser;
     let isDbUserChanged = false;
     let isLocalUserChanged = false;
-
-    console.log(localUser, dbUser);
-
 
     if (!dbUser) {
         user = localUser;
