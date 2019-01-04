@@ -1,15 +1,19 @@
 import {GoogleSignin} from "react-native-google-signin";
 import firebase from "react-native-firebase";
 import {AsyncStorage} from "react-native";
-import {setUser, setUserRef} from "../../user/store/actions";
+import {setUser, setUserRef, setJustRegister} from "../../user/store/actions";
 
 export const fetchData = () => {
     return dispatch  => {
         fetchUser().then(
-            (user) => {
+            (data) => {
+                const { user, fistFetch } = data;
                 dispatch(setUser(user));
+                if(fistFetch){
+                    dispatch(setJustRegister(true));
+                }
 
-                subscribeDBUser(user, dispatch);
+                subscribeDBUser(user, dispatch, fistFetch);
             }
         );
 
@@ -19,15 +23,20 @@ export const fetchData = () => {
 const fetchUser = async () => {
 
     let user = await AsyncStorage.getItem(`@SHStore:user`);
+    let fistFetch = false;
 
     if (!user) {
+        fistFetch = true;
         user = await googleSignIn();
         await AsyncStorage.setItem(`@SHStore:user`, JSON.stringify(user));
     } else {
         user = JSON.parse(user);
     }
 
-    return user;
+    return {
+        user,
+        fistFetch
+    };
 
 };
 
@@ -71,7 +80,7 @@ const googleSignIn = async () => {
     }
 };
 
-const subscribeDBUser = (localUser, dispatch) => {
+const subscribeDBUser = (localUser, dispatch, fistFetch) => {
 
     const userRef = firebase.database().ref(`users/${localUser.uid}`);
 
@@ -80,11 +89,19 @@ const subscribeDBUser = (localUser, dispatch) => {
     userRef.on('value', (snapshot) => {
         const dbUser = snapshot.val();
 
-        syncUser(localUser, dbUser, userRef).then((result) => {
-            if(result.isLocalUserChanged){
-                dispatch(setUser(result.user));
-            }
-        });
+        if(dbUser && fistFetch){
+
+            AsyncStorage.setItem(`@SHStore:user`, JSON.stringify(dbUser));
+            dispatch(setUser(dbUser));
+
+        } else {
+            syncUser(localUser, dbUser, userRef).then((result) => {
+                if(result.isLocalUserChanged){
+                    dispatch(setUser(result.user));
+                }
+            });
+        }
+
     });
 
 };

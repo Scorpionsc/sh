@@ -7,13 +7,6 @@ import {
     StyleSheet,
 } from 'react-native'
 import OfflineNotification from '../../notifications/components/offlineNotification';
-import {AsyncStorage} from 'react-native'
-import {GoogleSignin} from "react-native-google-signin";
-import firebase from "react-native-firebase";
-import Navigation from "../../navigation/Navigation";
-import SocialSettingsContainer from "../../settings/containers/SocialSettingsContainer";
-import palette from "../../palette";
-import AuthLoadingScreenContainer from "../containers/AuthLoadingScreenContainer";
 
 class AuthLoadingScreen extends React.Component {
 

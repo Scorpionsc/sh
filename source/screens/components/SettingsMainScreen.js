@@ -10,8 +10,8 @@ import {
     Switch,
     TouchableNativeFeedback,
     BackHandler,
+    Platform,
 } from 'react-native';
-import { Platform } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 class SettingsMainScreen extends React.Component {
@@ -20,6 +20,21 @@ class SettingsMainScreen extends React.Component {
         user: PropTypes.object.isRequired,
 
         setUser: PropTypes.func.isRequired,
+    };
+
+    static getDerivedStateFromProps = (nextProps, prevState) => {
+
+        const {justRegister, user, setJustRegister} = nextProps;
+
+        if(justRegister && user.patient !== null){
+            setJustRegister(false);
+
+            return {
+                shouldRenderHome: true,
+            }
+        }
+
+        return null;
     };
 
     static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -60,6 +75,7 @@ class SettingsMainScreen extends React.Component {
 
         this.state = {
             patient: props.user.patient === null ? false : props.user.patient,
+            shouldRenderHome: false,
         };
 
         this.didFocusSubscription = props.navigation.addListener('didFocus', payload =>
@@ -80,6 +96,15 @@ class SettingsMainScreen extends React.Component {
         this.willBlurSubscription && this.willBlurSubscription.remove();
     }
 
+
+
+    checkFirstSettings = () => {
+        const { shouldRenderHome } = this.state;
+
+        if(shouldRenderHome){
+            this.props.navigation.navigate('Home');
+        }
+    };
 
     onBackButtonPressAndroid = () => {
         const {navigation} = this.props;
@@ -146,6 +171,8 @@ class SettingsMainScreen extends React.Component {
 
 
     render() {
+
+        this.checkFirstSettings();
 
         return (<View style={[styles.settings]}>
 

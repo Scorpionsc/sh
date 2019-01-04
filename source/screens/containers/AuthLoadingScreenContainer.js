@@ -10,7 +10,7 @@ const mapStateToProps = state => ({
 
 const mapActionsToProps = (dispatch) => {
     return {
-        fetchData: bindActionCreators(fetchData, dispatch)
+        fetchData: bindActionCreators(fetchData, dispatch),
     }
 };
 
