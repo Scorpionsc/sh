@@ -37,7 +37,7 @@ class SettingsMainScreen extends React.Component {
         return null;
     };
 
-    static navigationOptions = ({ navigation, navigationOptions }) => {
+    static navigationOptions = ({ navigation }) => {
         const { params } = navigation.state;
 
         return params.backButton
