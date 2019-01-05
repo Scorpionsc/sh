@@ -1,7 +1,7 @@
 import {GoogleSignin} from "react-native-google-signin";
 import firebase from "react-native-firebase";
 import {AsyncStorage} from "react-native";
-import {setUser, setUserRef, setJustRegister} from "../../user/store/actions";
+import {setUser, setUserRef, setJustRegister} from "../user/actions";
 
 export const fetchData = () => {
     return dispatch  => {

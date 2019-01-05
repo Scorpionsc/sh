@@ -13,6 +13,7 @@ import {
     Platform,
 } from 'react-native';
 import Icon from "react-native-vector-icons/Ionicons";
+import { StackActions, NavigationActions } from 'react-navigation';
 
 class SettingsMainScreen extends React.Component {
 
@@ -22,7 +23,7 @@ class SettingsMainScreen extends React.Component {
         setUser: PropTypes.func.isRequired,
     };
 
-    static getDerivedStateFromProps = (nextProps, prevState) => {
+    static getDerivedStateFromProps = (nextProps) => {
 
         const {justRegister, user, setJustRegister} = nextProps;
 
@@ -39,33 +40,64 @@ class SettingsMainScreen extends React.Component {
 
     static navigationOptions = ({ navigation }) => {
         const { params } = navigation.state;
+        const options = {
+            title: 'Main Settings',
+            tabBarVisible: false,
+            headerRight: (
+                <View style={[styles.settingsHeadButtonWrap]}>
+                    <TouchableNativeFeedback
+                        onPress={params.handleSave}
+                        background={TouchableNativeFeedback.SelectableBackground()}
+                        borderRadius={20}
+                    >
+                        <View style={styles.settingsHeadButton}>
+                            <Icon
+                                name={Platform.OS === "ios" ? "ios-checkmark" : "md-checkmark"}
+                                color={palette.color2}
+                                size={35}
+                                onPress={this.saveSettings}
+                            />
+                        </View>
 
-        return params.backButton
-            ? { title: 'Main Settings' }
-            : {
-                title: 'Main Settings',
-                headerLeft: null,
-                headerRight: (
-                    <View style={[styles.settingsHeadButtonWrap]}>
-                        <TouchableNativeFeedback
-                            onPress={params.handleSave}
-                            background={TouchableNativeFeedback.SelectableBackground()}
-                            borderRadius={20}
-                        >
-                            <View style={styles.settingsHeadButton}>
-                                <Icon
-                                    name={Platform.OS === "ios" ? "ios-checkmark" : "md-checkmark"}
-                                    color={palette.color2}
-                                    size={35}
-                                    onPress={this.saveSettings}
-                                />
+                    </TouchableNativeFeedback>
+                </View>
+            ),
+        };
+
+        if(params){
+
+            return params && params.backButton
+                ? options
+                : ()=>(
+                    {
+                        ...options,
+                        headerLeft: null,
+                        headerRight: (
+                            <View style={[styles.settingsHeadButtonWrap]}>
+                                <TouchableNativeFeedback
+                                    onPress={params.handleSave}
+                                    background={TouchableNativeFeedback.SelectableBackground()}
+                                    borderRadius={20}
+                                >
+                                    <View style={styles.settingsHeadButton}>
+                                        <Icon
+                                            name={Platform.OS === "ios" ? "ios-checkmark" : "md-checkmark"}
+                                            color={palette.color2}
+                                            size={35}
+                                            onPress={this.saveSettings}
+                                        />
+                                    </View>
+
+                                </TouchableNativeFeedback>
                             </View>
+                        )
+                    }
+                );
 
-                        </TouchableNativeFeedback>
+        } else {
+            return options
+        }
 
-                    </View>
-                )
-            };
 
     };
 
@@ -74,28 +106,35 @@ class SettingsMainScreen extends React.Component {
         super(props);
 
         this.state = {
-            patient: props.user.patient === null ? false : props.user.patient,
+            patient: props.user.patient === null ? true : props.user.patient,
             shouldRenderHome: false,
         };
+        this.props.navigation.setParams({ handleSave: this.saveSettings });
 
-        this.didFocusSubscription = props.navigation.addListener('didFocus', payload =>
-            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
-        );
+        this.subscribeBackButton();
+
     }
 
 
     componentDidMount() {
-        this.props.navigation.setParams({ handleSave: this.saveSettings });
-        this.willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
-            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
-        );
+        const {navigation} = this.props;
+
+        if(navigation.state.params && !navigation.state.params.backButton){
+            this.willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+                BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+            );
+        }
     }
 
     componentWillUnmount() {
-        this.didFocusSubscription && this.didFocusSubscription.remove();
-        this.willBlurSubscription && this.willBlurSubscription.remove();
-    }
+        const {navigation} = this.props;
 
+        if(navigation.state.params && !navigation.state.params.backButton){
+            this.didFocusSubscription && this.didFocusSubscription.remove();
+            this.willBlurSubscription && this.willBlurSubscription.remove();
+        }
+
+    }
 
 
     checkFirstSettings = () => {
@@ -156,6 +195,15 @@ class SettingsMainScreen extends React.Component {
         </View>);
     };
 
+    resetNavigation = () => {
+        const resetAction = StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: 'More' })],
+        });
+
+        this.props.navigation.dispatch(resetAction);
+    };
+
     saveSettings = () => {
         const {setUser, user} = this.props;
         const {patient} = this.state;
@@ -166,7 +214,19 @@ class SettingsMainScreen extends React.Component {
             patient,
         } );
 
+        this.resetNavigation();
+
         this.props.navigation.navigate('Home');
+    };
+
+    subscribeBackButton = () => {
+        const {navigation} = this.props;
+
+        if(navigation.state.params && !navigation.state.params.backButton){
+            this.didFocusSubscription = navigation.addListener('didFocus', () =>
+                BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+            );
+        }
     };
 
 

@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MainPreLoader from '../../mainPreLoader/components/MainPreLoader';
+import MainPreLoader from '../../mainPreLoader/MainPreLoader';
 import {
     View,
     NetInfo,
     StyleSheet,
 } from 'react-native'
-import OfflineNotification from '../../notifications/components/offlineNotification';
+import OfflineNotification from '../../notifications/offlineNotification';
 
 class AuthLoadingScreen extends React.Component {
 

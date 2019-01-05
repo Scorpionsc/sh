@@ -48,6 +48,17 @@ const getTabBarIcon = (navigation, focused, tintColor) => {
     return <IconComponent name={iconName} size={25} color={tintColor} />;
 };
 
+const hideTabBar = ({ navigation }) => {
+    let tabBarVisible = true;
+    if (navigation.state.index > 0) {
+        tabBarVisible = false;
+    }
+
+    return {
+        tabBarVisible,
+    };
+};
+
 const HomeStack = createStackNavigator({
         Home: HomeScreenContainer,
     },
@@ -55,6 +66,7 @@ const HomeStack = createStackNavigator({
         defaultNavigationOptions,
     },
 );
+HomeStack.navigationOptions = hideTabBar;
 
 const CalculatorStack = createStackNavigator({
         Calculator: CalculatorScreenContainer,
@@ -62,6 +74,7 @@ const CalculatorStack = createStackNavigator({
     {
         defaultNavigationOptions,
     });
+CalculatorStack.navigationOptions = hideTabBar;
 
 const FoodStack = createStackNavigator({
         Food: FoodScreenContainer,
@@ -69,6 +82,7 @@ const FoodStack = createStackNavigator({
     {
         defaultNavigationOptions,
     });
+FoodStack.navigationOptions = hideTabBar;
 
 const MoreStack = createStackNavigator({
         More: MoreScreen,
@@ -78,6 +92,9 @@ const MoreStack = createStackNavigator({
     {
         defaultNavigationOptions,
     });
+MoreStack.navigationOptions = hideTabBar;
+
+
 
 const BottomNavTabs = createBottomTabNavigator({
         Home: HomeStack,
