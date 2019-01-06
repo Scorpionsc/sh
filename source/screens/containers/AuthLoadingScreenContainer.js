@@ -8,10 +8,8 @@ const mapStateToProps = state => ({
 });
 
 
-const mapActionsToProps = (dispatch) => {
-    return {
-        fetchData: bindActionCreators(fetchData, dispatch),
-    }
-};
+const mapActionsToProps = (dispatch) => ({
+    fetchData: bindActionCreators(fetchData, dispatch),
+});
 
 export default connect(mapStateToProps, mapActionsToProps)(AuthLoadingScreen);

@@ -12,6 +12,7 @@ import SettingsMainScreenContainer from "../screens/containers/SettingsMainScree
 
 import MoreScreen from "../screens/components/MoreScreen";
 import SettingsScreen from "../screens/components/SettingsScreen";
+import BluetoothScreenContainer from "../screens/containers/BluetoothScreenContainer";
 
 const defaultNavigationOptions = {
     headerStyle: {
@@ -88,6 +89,7 @@ const MoreStack = createStackNavigator({
         More: MoreScreen,
         Settings: SettingsScreen,
         SettingsMain: SettingsMainScreenContainer,
+        Bluetooth: BluetoothScreenContainer,
     },
     {
         defaultNavigationOptions,
@@ -103,7 +105,7 @@ const BottomNavTabs = createBottomTabNavigator({
         More: MoreStack,
     },
     {
-        initialRouteName: 'Home',
+        initialRouteName: 'More',
         defaultNavigationOptions: ({ navigation }) => ({
             tabBarIcon: ({ focused, horizontal, tintColor }) => getTabBarIcon(navigation, focused, tintColor),
         }),

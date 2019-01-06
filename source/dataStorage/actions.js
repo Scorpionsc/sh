@@ -16,8 +16,27 @@ export const fetchData = () => {
                 subscribeDBUser(user, dispatch, fistFetch);
             }
         );
+        fetchDevice().then((device)=>{
+
+        });
 
     }
+};
+
+
+
+export const updateDevice = () => {
+
+};
+
+const fetchDevice = async () => {
+
+    const device = await AsyncStorage.getItem(`@SHStore:device`);
+
+    return device
+        ? JSON.parse(device)
+        : null;
+
 };
 
 const fetchUser = async () => {
@@ -39,6 +58,8 @@ const fetchUser = async () => {
     };
 
 };
+
+
 
 const googleSignIn = async () => {
     try {
@@ -136,4 +157,6 @@ const syncUser = async (localUser, dbUser, userRef) => {
     };
 
 };
+
+
 

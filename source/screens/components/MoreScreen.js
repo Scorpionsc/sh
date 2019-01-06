@@ -16,6 +16,10 @@ class MoreScreen extends React.Component {
                         title: 'Main Settings',
                         route: 'SettingsMain',
                     },
+                    {
+                        title: 'Bluetooth connection',
+                        route: 'Bluetooth',
+                    },
                 ],
             }
         ]
