@@ -1,6 +1,7 @@
 import {GoogleSignin} from "react-native-google-signin";
 import firebase from "react-native-firebase";
 import {AsyncStorage} from "react-native";
+import {setDeviceId} from '../bluetooth/actions';
 import {setUser, setUserRef, setJustRegister} from "../user/actions";
 
 export const fetchData = () => {
@@ -16,25 +17,22 @@ export const fetchData = () => {
                 subscribeDBUser(user, dispatch, fistFetch);
             }
         );
-        fetchDevice().then((device)=>{
-
+        fetchDeviceId().then((deviceId)=>{
+            if(deviceId){
+                dispatch(setDeviceId(deviceId));
+            }
         });
 
     }
 };
 
 
+const fetchDeviceId = async () => {
 
-export const updateDevice = () => {
+    const deviceId = await AsyncStorage.getItem(`@SHStore:deviceId`);
 
-};
-
-const fetchDevice = async () => {
-
-    const device = await AsyncStorage.getItem(`@SHStore:device`);
-
-    return device
-        ? JSON.parse(device)
+    return deviceId
+        ? deviceId
         : null;
 
 };

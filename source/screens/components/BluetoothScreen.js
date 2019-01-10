@@ -8,11 +8,17 @@ import MenuItem from "../../menuItem/MenuItem";
 class BluetoothScreen extends React.Component {
 
     static propTypes = {
-        isScanning: PropTypes.bool.isRequired,
+        deviceId: PropTypes.string,
         devices: PropTypes.array.isRequired,
+        isConnected: PropTypes.bool.isRequired,
+        isScanning: PropTypes.bool.isRequired,
 
         findDevices: PropTypes.func.isRequired,
-        setDevice: PropTypes.func.isRequired,
+        setDeviceId: PropTypes.func.isRequired,
+    };
+
+    static defaultProps = {
+        deviceId: null,
     };
 
     static navigationOptions = { headerTitle: 'Bluetooth connection' };
@@ -25,16 +31,16 @@ class BluetoothScreen extends React.Component {
     }
 
     componentWillUnmount(){
-        this.stopDeviceSearh();
+        this.stopDeviceSearch();
     }
 
 
     keyExtractor = (item) => item.subTitle;
 
     onItemClick = (data)=>{
-        const {setDevice} = this.props;
+        const {setDeviceId} = this.props;
 
-        setDevice(data.device);
+        setDeviceId(data.device.id);
     };
 
     requestLocationPermission = async () => {
@@ -62,7 +68,11 @@ class BluetoothScreen extends React.Component {
         </View>
     );
 
-    renderItem = ({item}) => (<MenuItem data={item} onClick={this.onItemClick}/>);
+    renderItem = ({item}) => {
+        const { deviceId, isConnected } = this.props;
+
+        return (<MenuItem data={item} active={item.device.id === deviceId} conected={isConnected} onClick={this.onItemClick}/>);
+    };
 
     scanDevices = () => {
         const {findDevices} = this.props;
@@ -70,7 +80,7 @@ class BluetoothScreen extends React.Component {
         findDevices(true);
     };
 
-    stopDeviceSearh = () => {
+    stopDeviceSearch = () => {
         const {findDevices} = this.props;
 
         findDevices(false);

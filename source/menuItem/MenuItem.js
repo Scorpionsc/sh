@@ -1,43 +1,69 @@
 import React from "react";
-import {View, Text, StyleSheet, TouchableNativeFeedback} from "react-native";
+import {View, Text, StyleSheet, TouchableNativeFeedback, Platform} from "react-native";
 import palette from "../palette";
 import PropTypes from "prop-types";
+import Icon from "react-native-vector-icons/Ionicons";
+
 
 class MenuItem extends React.PureComponent {
 
     static propTypes = {
+        active: PropTypes.bool,
         data: PropTypes.object.isRequired,
+        isConnected: PropTypes.bool,
 
         onClick: PropTypes.func,
     };
 
     static defaultProps = {
+        active: false,
+        isConnected: false,
+
         onClick: () => {
         },
     };
 
     onPress = () => {
-        const {data, onClick} = this.props;
+        const {data, onClick, active} = this.props;
 
-        onClick(data);
+        if(!active) onClick(data);
     };
 
-    renderSubTitle = () => {
+    renderSubTitle = (styles) => {
         const {data} = this.props;
 
         return data.subTitle
-            ? (<Text style={[styles.menuItemSubTitle]}>{data.subTitle}</Text>)
+            ? (<Text style={styles}>{data.subTitle}</Text>)
             : null;
-    }
+    };
+
+    renderConnected = () => {
+        const {isConnected} = this.props;
+
+        return isConnected
+            ? (<Icon
+                name={Platform.OS === "ios" ? "ios-bluetooth" : "md-bluetooth"}
+                color={palette.color4}
+                size={35}
+            />)
+            : null;
+
+    };
 
     render() {
-        const {data} = this.props;
+        const {data, active} = this.props;
+        const textStyles = [styles.menuItemTitle];
+
+        if (active) textStyles.push(styles.menuItemActive);
 
         return (
             <TouchableNativeFeedback onPress={this.onPress} background={TouchableNativeFeedback.SelectableBackground()}>
                 <View style={[styles.menuItem]}>
-                    <Text style={[styles.menuItemTitle]}>{data.title}</Text>
-                    {this.renderSubTitle()}
+                    <View>
+                        <Text style={textStyles}>{data.title}</Text>
+                        {this.renderSubTitle(textStyles)}
+                    </View>
+                    {this.renderConnected()}
                 </View>
             </TouchableNativeFeedback>
         );
@@ -51,6 +77,13 @@ const styles = StyleSheet.create({
         paddingBottom: 15,
         borderBottomWidth: 1,
         borderColor: palette.color5,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    menuItemActive: {
+        color: palette.color4,
     },
     menuItemTitle: {
         fontSize: 20,
