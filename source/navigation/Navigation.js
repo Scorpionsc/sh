@@ -5,14 +5,14 @@ import Icon from "react-native-vector-icons/Ionicons";
 import React from 'react';
 
 import AuthLoadingScreenContainer from '../screens/containers/AuthLoadingScreenContainer';
+import BluetoothScreenContainer from "../screens/containers/BluetoothScreenContainer";
 import CalculatorScreenContainer from "../screens/containers/CalculatorScreenContainer";
 import HomeScreenContainer from '../screens/containers/HomeScreenContainer';
 import FoodScreenContainer from "../screens/containers/FoodScreenContainer";
+import MoreScreenContainer from "../screens/containers/MoreScreenContainer";
 import SettingsMainScreenContainer from "../screens/containers/SettingsMainScreenContainer";
 
-import MoreScreen from "../screens/components/MoreScreen";
 import SettingsScreen from "../screens/components/SettingsScreen";
-import BluetoothScreenContainer from "../screens/containers/BluetoothScreenContainer";
 
 const defaultNavigationOptions = {
     headerStyle: {
@@ -86,7 +86,7 @@ const FoodStack = createStackNavigator({
 FoodStack.navigationOptions = hideTabBar;
 
 const MoreStack = createStackNavigator({
-        More: MoreScreen,
+        More: MoreScreenContainer,
         Settings: SettingsScreen,
         SettingsMain: SettingsMainScreenContainer,
         Bluetooth: BluetoothScreenContainer,

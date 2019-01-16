@@ -2,8 +2,13 @@ import React from "react";
 import {StyleSheet, SectionList, View, Text} from "react-native";
 import palette from "../../palette";
 import MenuItem from "../../menuItem/MenuItem";
+import PropTypes from "prop-types";
 
 class MoreScreen extends React.Component {
+
+    static propTypes = {
+        user: PropTypes.object.isRequired,
+    };
 
     static navigationOptions = {header: null};
 
@@ -15,10 +20,12 @@ class MoreScreen extends React.Component {
                     {
                         title: 'Main Settings',
                         route: 'SettingsMain',
+                        role: 'all',
                     },
                     {
                         title: 'Bluetooth connection',
                         route: 'Bluetooth',
+                        role: 'patient',
                     },
                 ],
             }
@@ -34,6 +41,14 @@ class MoreScreen extends React.Component {
 
     };
 
+    renderMenuItem = ({item, index}) => {
+
+        const {user} = this.props;
+
+        return item.role === 'all' || ( item.role === 'patient' && user.patient )
+            ? <MenuItem key={index} data={item} onClick={this.onItemClick}/>
+            : null;
+    };
 
     render() {
         const {menuSections} = this.state;
@@ -41,12 +56,13 @@ class MoreScreen extends React.Component {
         return (
             <View style={[styles.more]}>
                 <SectionList style={[styles.moreList]} sections={menuSections}
-                             renderItem={({item, index}) => <MenuItem key={index} data={item} onClick={this.onItemClick}/>}
+                             renderItem={this.renderMenuItem}
                              renderSectionHeader={({section: {title}}) => (<Text style={[styles.moreTitle]}>{title}</Text>)}
                              keyExtractor={(item, index) => item + index}/>
             </View>
         );
     }
+
 }
 
 const styles = StyleSheet.create({
