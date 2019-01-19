@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MainPreLoader from '../../mainPreLoader/MainPreLoader';
 import {
-    View,
+    SafeAreaView,
     NetInfo,
     StyleSheet,
 } from 'react-native'
@@ -74,13 +74,13 @@ class AuthLoadingScreen extends React.Component {
 
     render() {
 
-        return (<View style={[styles.main]}>
+        return (<SafeAreaView style={[styles.main]}>
 
             {this.renderOfflineMessage()}
 
             <MainPreLoader/>
 
-        </View>);
+        </SafeAreaView>);
 
     }
 

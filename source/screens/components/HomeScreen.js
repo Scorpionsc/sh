@@ -1,5 +1,5 @@
 import React from "react";
-import {View, Text, StyleSheet} from "react-native";
+import {SafeAreaView, Text, StyleSheet} from "react-native";
 import PropTypes from "prop-types";
 import palette from "../../palette";
 
@@ -29,9 +29,9 @@ class HomeScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.home}>
+            <SafeAreaView style={styles.home}>
                 <Text style={styles.temp}>Home Screen</Text>
-            </View>
+            </SafeAreaView>
         );
     }
 }

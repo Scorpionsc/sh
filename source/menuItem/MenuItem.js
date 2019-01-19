@@ -1,5 +1,5 @@
 import React from "react";
-import {View, Text, StyleSheet, TouchableNativeFeedback, Platform} from "react-native";
+import {View, Text, StyleSheet,TouchableOpacity, TouchableNativeFeedback, Platform} from "react-native";
 import palette from "../palette";
 import PropTypes from "prop-types";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -26,7 +26,7 @@ class MenuItem extends React.PureComponent {
     onPress = () => {
         const {data, onClick, active} = this.props;
 
-        if(!active) onClick(data);
+        if (!active) onClick(data);
     };
 
     renderSubTitle = (styles) => {
@@ -56,17 +56,30 @@ class MenuItem extends React.PureComponent {
 
         if (active) textStyles.push(styles.menuItemActive);
 
-        return (
-            <TouchableNativeFeedback onPress={this.onPress} background={TouchableNativeFeedback.SelectableBackground()}>
-                <View style={[styles.menuItem]}>
-                    <View>
-                        <Text style={textStyles}>{data.title}</Text>
-                        {this.renderSubTitle(textStyles)}
+        return Platform.OS === 'ios'
+            ? (
+                <TouchableOpacity onPress={this.onPress}>
+                    <View style={[styles.menuItem]}>
+                        <View>
+                            <Text style={textStyles}>{data.title}</Text>
+                            {this.renderSubTitle(textStyles)}
+                        </View>
+                        {this.renderConnected()}
                     </View>
-                    {this.renderConnected()}
-                </View>
-            </TouchableNativeFeedback>
-        );
+                </TouchableOpacity>
+            )
+            : (
+                <TouchableNativeFeedback onPress={this.onPress}
+                                         background={TouchableNativeFeedback.SelectableBackground()}>
+                    <View style={[styles.menuItem]}>
+                        <View>
+                            <Text style={textStyles}>{data.title}</Text>
+                            {this.renderSubTitle(textStyles)}
+                        </View>
+                        {this.renderConnected()}
+                    </View>
+                </TouchableNativeFeedback>
+            );
     }
 }
 

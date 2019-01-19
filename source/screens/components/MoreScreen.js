@@ -1,5 +1,5 @@
 import React from "react";
-import {StyleSheet, SectionList, View, Text} from "react-native";
+import {StyleSheet, SectionList, SafeAreaView, Text, View} from "react-native";
 import palette from "../../palette";
 import MenuItem from "../../menuItem/MenuItem";
 import PropTypes from "prop-types";
@@ -41,6 +41,14 @@ class MoreScreen extends React.Component {
 
     };
 
+    renderTitle = ({section: {title}}) => {
+        return (
+            <View style={[styles.moreTitleWrap]}>
+                <Text style={[styles.moreTitle]}>{title}</Text>
+            </View>
+        )
+    };
+
     renderMenuItem = ({item, index}) => {
 
         const {user} = this.props;
@@ -54,12 +62,12 @@ class MoreScreen extends React.Component {
         const {menuSections} = this.state;
 
         return (
-            <View style={[styles.more]}>
+            <SafeAreaView style={[styles.more]}>
                 <SectionList style={[styles.moreList]} sections={menuSections}
                              renderItem={this.renderMenuItem}
-                             renderSectionHeader={({section: {title}}) => (<Text style={[styles.moreTitle]}>{title}</Text>)}
+                             renderSectionHeader={this.renderTitle}
                              keyExtractor={(item, index) => item + index}/>
-            </View>
+            </SafeAreaView>
         );
     }
 
@@ -79,14 +87,16 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
     },
     moreTitle: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '700',
         color: palette.color2,
+    },
+    moreTitleWrap: {
         borderBottomWidth: 3,
         borderColor: palette.color5,
         paddingTop: 5,
         paddingBottom: 5,
-    }
+    },
 
 });
 
