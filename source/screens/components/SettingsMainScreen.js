@@ -9,6 +9,7 @@ import {
     Image,
     ScrollView,
     Switch,
+    TouchableOpacity,
     TouchableNativeFeedback,
     BackHandler,
     Platform,
@@ -46,15 +47,15 @@ class SettingsMainScreen extends React.Component {
             tabBarVisible: false,
             headerRight: Platform.OS === 'ios'
                 ? (
-                    <View style={[styles.settingsHeadButtonWrap]}>
-                        <View style={styles.settingsHeadButton}>
+                    <View>
+                        <TouchableOpacity style={[styles.settingsHeadButtonWrapIOS]}
+                                          onPress={() => params.handleSave()}>
                             <Icon
                                 name='ios-checkmark'
                                 color={palette.color2}
                                 size={40}
-                                onPress={() => params.handleSave()}
                             />
-                        </View>
+                        </TouchableOpacity>
                     </View>
                 )
                 : (
@@ -89,7 +90,6 @@ class SettingsMainScreen extends React.Component {
             return options
         }
 
-
     };
 
 
@@ -111,8 +111,6 @@ class SettingsMainScreen extends React.Component {
         const {navigation} = this.props;
 
         if (navigation.state.params && !navigation.state.params.backButton) {
-            console.log(8888);
-
             this.props.navigation.setParams({handleSave: () => this.saveSettings()});
             this.willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
                 BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
@@ -274,6 +272,15 @@ const styles = StyleSheet.create({
         backgroundColor: palette.color3,
         justifyContent: 'flex-start',
         alignItems: 'center',
+    },
+    settingsHeadButtonWrapIOS: {
+        marginRight: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: palette.color5,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
     },
     settingsHeadButtonWrap: {
         flex: 1,

@@ -1,5 +1,5 @@
 import React from "react";
-import {View, Text, StyleSheet,TouchableHighlight, TouchableNativeFeedback, Platform} from "react-native";
+import {View, Text, StyleSheet,TouchableOpacity, TouchableNativeFeedback, Platform} from "react-native";
 import palette from "../palette";
 import PropTypes from "prop-types";
 
@@ -17,10 +17,7 @@ class MenuItem extends React.PureComponent {
     };
 
     onPress = () => {
-        console.log(300);
-
         const {data, onClick} = this.props;
-        console.log(500);
 
         onClick(data);
     };
@@ -30,9 +27,11 @@ class MenuItem extends React.PureComponent {
 
         return Platform.OS === 'ios'
             ? (
-                <TouchableHighlight style={[styles.menuItem]} onPress={this.onPress} underlayColor={palette.color5}>
-                    <Text style={[styles.menuItemTitle]}>{data.title}</Text>
-                </TouchableHighlight>
+                <TouchableOpacity onPress={this.onPress}>
+                    <View style={[styles.menuItem]}>
+                        <Text style={[styles.menuItemTitle]}>{data.title}</Text>
+                    </View>
+                </TouchableOpacity>
             )
             : (
                 <TouchableNativeFeedback onPress={this.onPress}
@@ -48,14 +47,14 @@ class MenuItem extends React.PureComponent {
 const styles = StyleSheet.create({
     menuItem: {
         alignSelf: 'stretch',
+        borderColor: palette.color5,
+        borderBottomWidth: 1,
+        paddingTop: 15,
+        paddingBottom: 15,
     },
     menuItemTitle: {
         fontSize: 20,
         color: palette.color2,
-        borderBottomWidth: 1,
-        borderColor: palette.color5,
-        paddingTop: 15,
-        paddingBottom: 15,
     }
 
 });
