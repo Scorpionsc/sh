@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableNativeFeedback } from "react-native";
+import {View, Text, StyleSheet,TouchableHighlight, TouchableNativeFeedback, Platform} from "react-native";
 import palette from "../palette";
 import PropTypes from "prop-types";
 
@@ -12,25 +12,36 @@ class MenuItem extends React.PureComponent {
     };
 
     static defaultProps = {
-        onClick: () => {},
+        onClick: () => {
+        },
     };
 
     onPress = () => {
+        console.log(300);
+
         const {data, onClick} = this.props;
+        console.log(500);
 
         onClick(data);
     };
 
     render() {
-        const {data, onClick} = this.props;
+        const {data} = this.props;
 
-        return (
-            <TouchableNativeFeedback onPress={this.onPress} background={TouchableNativeFeedback.SelectableBackground()}>
-                <View style={[styles.menuItem]}>
-                    <Text style={[styles.menuItemTitle]}>{ data.title }</Text>
-                </View>
-            </TouchableNativeFeedback>
-        );
+        return Platform.OS === 'ios'
+            ? (
+                <TouchableHighlight style={[styles.menuItem]} onPress={this.onPress} underlayColor={palette.color5}>
+                    <Text style={[styles.menuItemTitle]}>{data.title}</Text>
+                </TouchableHighlight>
+            )
+            : (
+                <TouchableNativeFeedback onPress={this.onPress}
+                                         background={TouchableNativeFeedback.SelectableBackground()}>
+                    <View style={[styles.menuItem]}>
+                        <Text style={[styles.menuItemTitle]}>{data.title}</Text>
+                    </View>
+                </TouchableNativeFeedback>
+            );
     }
 }
 

@@ -12,7 +12,6 @@ export const fetchData = () => {
                 if(fistFetch){
                     dispatch(setJustRegister(true));
                 }
-
                 subscribeDBUser(user, dispatch, fistFetch);
             }
         );
@@ -87,6 +86,7 @@ const subscribeDBUser = (localUser, dispatch, fistFetch) => {
     dispatch(setUserRef(userRef));
 
     userRef.on('value', (snapshot) => {
+
         const dbUser = snapshot.val();
 
         if(dbUser && fistFetch){
@@ -120,6 +120,7 @@ const syncUser = async (localUser, dbUser, userRef) => {
         if (localUser.updatedAt > dbUser.updatedAt) {
             isDbUserChanged = true;
             user = localUser;
+            user.patient = dbUser.patient;
         } else if (localUser.updatedAt < dbUser.updatedAt) {
             isLocalUserChanged = true;
             user = dbUser;

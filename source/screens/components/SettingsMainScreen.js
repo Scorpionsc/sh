@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import palette from '../../palette';
 import {
     StyleSheet,
+    SafeAreaView,
     View,
     Text,
     Image,
@@ -13,7 +14,7 @@ import {
     Platform,
 } from 'react-native';
 import Icon from "react-native-vector-icons/Ionicons";
-import { StackActions, NavigationActions } from 'react-navigation';
+import {StackActions, NavigationActions} from 'react-navigation';
 
 class SettingsMainScreen extends React.Component {
 
@@ -27,7 +28,7 @@ class SettingsMainScreen extends React.Component {
 
         const {justRegister, user, setJustRegister} = nextProps;
 
-        if(justRegister && user.patient !== null){
+        if (justRegister && user.patient !== null) {
             setJustRegister(false);
 
             return {
@@ -38,13 +39,25 @@ class SettingsMainScreen extends React.Component {
         return null;
     };
 
-    static navigationOptions = ({ navigation }) => {
-        const { params } = navigation.state;
+    static navigationOptions = ({navigation}) => {
+        const {params} = navigation.state;
         const options = {
             title: 'Main Settings',
             tabBarVisible: false,
-            headerRight: (
-                <View style={[styles.settingsHeadButtonWrap]}>
+            headerRight: Platform.OS === 'ios'
+                ? (
+                    <View style={[styles.settingsHeadButtonWrap]}>
+                        <View style={styles.settingsHeadButton}>
+                            <Icon
+                                name='ios-checkmark'
+                                color={palette.color2}
+                                size={40}
+                                onPress={() => params.handleSave()}
+                            />
+                        </View>
+                    </View>
+                )
+                : (
                     <TouchableNativeFeedback
                         onPress={params.handleSave}
                         background={TouchableNativeFeedback.SelectableBackground()}
@@ -52,47 +65,25 @@ class SettingsMainScreen extends React.Component {
                     >
                         <View style={styles.settingsHeadButton}>
                             <Icon
-                                name={Platform.OS === "ios" ? "ios-checkmark" : "md-checkmark"}
+                                name='md-checkmark'
                                 color={palette.color2}
                                 size={35}
-                                onPress={this.saveSettings}
+                                onPress={() => params.handleSave()}
                             />
                         </View>
 
                     </TouchableNativeFeedback>
-                </View>
-            ),
+                ),
         };
 
-        if(params){
+        if (params) {
 
             return params && params.backButton
                 ? options
-                : ()=>(
-                    {
-                        ...options,
-                        headerLeft: null,
-                        headerRight: (
-                            <View style={[styles.settingsHeadButtonWrap]}>
-                                <TouchableNativeFeedback
-                                    onPress={params.handleSave}
-                                    background={TouchableNativeFeedback.SelectableBackground()}
-                                    borderRadius={20}
-                                >
-                                    <View style={styles.settingsHeadButton}>
-                                        <Icon
-                                            name={Platform.OS === "ios" ? "ios-checkmark" : "md-checkmark"}
-                                            color={palette.color2}
-                                            size={35}
-                                            onPress={this.saveSettings}
-                                        />
-                                    </View>
-
-                                </TouchableNativeFeedback>
-                            </View>
-                        )
-                    }
-                );
+                : {
+                    ...options,
+                    headerLeft: null,
+                };
 
         } else {
             return options
@@ -102,14 +93,14 @@ class SettingsMainScreen extends React.Component {
     };
 
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
             patient: props.user.patient === null ? true : props.user.patient,
             shouldRenderHome: false,
         };
-        this.props.navigation.setParams({ handleSave: this.saveSettings });
+        this.props.navigation.setParams({handleSave: this.saveSettings});
 
         this.subscribeBackButton();
 
@@ -119,7 +110,10 @@ class SettingsMainScreen extends React.Component {
     componentDidMount() {
         const {navigation} = this.props;
 
-        if(navigation.state.params && !navigation.state.params.backButton){
+        if (navigation.state.params && !navigation.state.params.backButton) {
+            console.log(8888);
+
+            this.props.navigation.setParams({handleSave: () => this.saveSettings()});
             this.willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
                 BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
             );
@@ -129,7 +123,7 @@ class SettingsMainScreen extends React.Component {
     componentWillUnmount() {
         const {navigation} = this.props;
 
-        if(navigation.state.params && !navigation.state.params.backButton){
+        if (navigation.state.params && !navigation.state.params.backButton) {
             this.didFocusSubscription && this.didFocusSubscription.remove();
             this.willBlurSubscription && this.willBlurSubscription.remove();
         }
@@ -138,9 +132,9 @@ class SettingsMainScreen extends React.Component {
 
 
     checkFirstSettings = () => {
-        const { shouldRenderHome } = this.state;
+        const {shouldRenderHome} = this.state;
 
-        if(shouldRenderHome){
+        if (shouldRenderHome) {
             this.props.navigation.navigate('Home');
         }
     };
@@ -160,15 +154,15 @@ class SettingsMainScreen extends React.Component {
     };
 
     renderPatientSelector = () => {
-        const { patient } = this.state;
+        const {patient} = this.state;
 
-        return(<View style={[styles.settingsLine]}>
+        return (<View style={[styles.settingsLine]}>
 
             <View style={[styles.settingsLineWrap]}>
                 <Text style={[styles.settingsLabel]}>Patient:</Text>
             </View>
 
-            <View style={[styles.settingsLineWrap]}>
+            <View style={[styles.settingsLineWrap, styles.settingsLineWrapLeft]}>
                 <Switch
                     value={patient}
                     onValueChange={this.onPatientStatusChange}
@@ -198,7 +192,7 @@ class SettingsMainScreen extends React.Component {
     resetNavigation = () => {
         const resetAction = StackActions.reset({
             index: 0,
-            actions: [NavigationActions.navigate({ routeName: 'More' })],
+            actions: [NavigationActions.navigate({routeName: 'More'})],
         });
 
         this.props.navigation.dispatch(resetAction);
@@ -208,11 +202,11 @@ class SettingsMainScreen extends React.Component {
         const {setUser, user} = this.props;
         const {patient} = this.state;
 
-        setUser( {
+        setUser({
             ...user,
             updatedAt: Date.now(),
             patient,
-        } );
+        });
 
         this.resetNavigation();
 
@@ -222,7 +216,7 @@ class SettingsMainScreen extends React.Component {
     subscribeBackButton = () => {
         const {navigation} = this.props;
 
-        if(navigation.state.params && !navigation.state.params.backButton){
+        if (navigation.state.params && !navigation.state.params.backButton) {
             this.didFocusSubscription = navigation.addListener('didFocus', () =>
                 BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
             );
@@ -234,7 +228,7 @@ class SettingsMainScreen extends React.Component {
 
         this.checkFirstSettings();
 
-        return (<View style={[styles.settings]}>
+        return (<SafeAreaView style={[styles.settings]}>
 
             <ScrollView style={[styles.settingsWrap]}>
 
@@ -244,7 +238,7 @@ class SettingsMainScreen extends React.Component {
 
             </ScrollView>
 
-        </View>);
+        </SafeAreaView>);
 
     }
 
@@ -306,6 +300,10 @@ const styles = StyleSheet.create({
         marginRight: 20,
         marginLeft: 20,
         alignSelf: 'stretch',
+    },
+    settingsLineWrapLeft: {
+        justifyContent: 'flex-end',
+        flexDirection: 'row',
     },
     settingsLine: {
         flexDirection: 'row',

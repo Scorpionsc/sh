@@ -1,5 +1,5 @@
 import React from "react";
-import {StyleSheet, SectionList, View, Text} from "react-native";
+import {StyleSheet, SectionList, SafeAreaView, Text} from "react-native";
 import palette from "../../palette";
 import MenuItem from "../../menuItem/MenuItem";
 
@@ -35,12 +35,12 @@ class MoreScreen extends React.Component {
         const {menuSections} = this.state;
 
         return (
-            <View style={[styles.more]}>
+            <SafeAreaView style={[styles.more]}>
                 <SectionList style={[styles.moreList]} sections={menuSections}
                              renderItem={({item, index}) => <MenuItem key={index} data={item} onClick={this.onItemClick}/>}
                              renderSectionHeader={({section: {title}}) => (<Text style={[styles.moreTitle]}>{title}</Text>)}
                              keyExtractor={(item, index) => item + index}/>
-            </View>
+            </SafeAreaView>
         );
     }
 }

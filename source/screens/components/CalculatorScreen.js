@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView, Text, StyleSheet } from "react-native";
 import PropTypes from "prop-types";
 import palette from "../../palette";
 
@@ -13,9 +13,9 @@ class CalculatorScreen extends React.Component {
 
     render() {
         return (
-            <View style={[styles.calculator]}>
+            <SafeAreaView style={[styles.calculator]}>
                 <Text style={[styles.temp]}>Calculator screen in progress...</Text>
-            </View>
+            </SafeAreaView>
         );
     }
 }
