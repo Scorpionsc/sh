@@ -1,17 +1,18 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { setUser, setJustRegister } from '../../user/actions';
+import { setUser, fetchUsers } from '../../user/actions';
 import SettingsMainScreen from "../components/SettingsMainScreen";
 
 const mapStateToProps = state => ({
     user: state.userData.user,
-    justRegister: state.userData.justRegister
+    users: state.userData.users,
+    usersLoading: state.userData.usersLoading,
 });
 
 const mapActionsToProps = dispatch => (
     {
+        fetchUsers: bindActionCreators( fetchUsers, dispatch ),
         setUser: bindActionCreators( setUser, dispatch ),
-        setJustRegister: bindActionCreators( setJustRegister, dispatch ),
     }
 );
 

@@ -4,6 +4,7 @@ import palette from '../../palette';
 import {
     StyleSheet,
     SafeAreaView,
+    ActivityIndicator,
     View,
     Text,
     Image,
@@ -13,6 +14,7 @@ import {
     TouchableNativeFeedback,
     BackHandler,
     Platform,
+    Picker,
 } from 'react-native';
 import Icon from "react-native-vector-icons/Ionicons";
 import {StackActions, NavigationActions} from 'react-navigation';
@@ -21,23 +23,11 @@ class SettingsMainScreen extends React.Component {
 
     static propTypes = {
         user: PropTypes.object.isRequired,
+        users: PropTypes.array.isRequired,
+        usersLoading: PropTypes.bool.isRequired,
 
+        fetchUsers: PropTypes.func.isRequired,
         setUser: PropTypes.func.isRequired,
-    };
-
-    static getDerivedStateFromProps = (nextProps) => {
-
-        const {justRegister, user, setJustRegister} = nextProps;
-
-        if (justRegister && user.patient !== null) {
-            setJustRegister(false);
-
-            return {
-                shouldRenderHome: true,
-            }
-        }
-
-        return null;
     };
 
     static navigationOptions = ({navigation}) => {
@@ -98,11 +88,15 @@ class SettingsMainScreen extends React.Component {
 
         this.state = {
             patient: props.user.patient === null ? true : props.user.patient,
-            shouldRenderHome: false,
         };
-        this.props.navigation.setParams({handleSave: this.saveSettings});
+        this.props.navigation.setParams({
+            handleSave: this.saveSettings,
+            backButton: !props.user.justSignIn
+        });
 
         this.subscribeBackButton();
+
+        this.getUsers();
 
     }
 
@@ -129,12 +123,9 @@ class SettingsMainScreen extends React.Component {
     }
 
 
-    checkFirstSettings = () => {
-        const {shouldRenderHome} = this.state;
-
-        if (shouldRenderHome) {
-            this.props.navigation.navigate('Home');
-        }
+    getUsers = () => {
+        const {fetchUsers, usersLoading, users} = this.props;
+        if( !usersLoading && !users.length ) fetchUsers();
     };
 
     onBackButtonPressAndroid = () => {
@@ -149,6 +140,33 @@ class SettingsMainScreen extends React.Component {
             patient: status,
         });
 
+    };
+
+
+    renderPatients = () => {
+        const { usersLoading, users, user} = this.props;
+
+        return (<View style={[styles.settingsLine]}>
+
+            {
+                usersLoading
+                    ? this.renderPreloader()
+                    : (
+                        <React.Fragment>
+                            <View style={[styles.settingsLineWrap]}>
+                                <Text style={[styles.settingsLabel]}>Follow:</Text>
+                            </View>
+
+                            <View style={[styles.settingsLineWrap, styles.settingsLineWrapLeft]}>
+                                {this.renderPicker()}
+                            </View>
+                        </React.Fragment>
+                    )
+            }
+
+
+
+        </View>);
     };
 
     renderPatientSelector = () => {
@@ -173,6 +191,23 @@ class SettingsMainScreen extends React.Component {
 
         </View>);
     };
+
+    renderPicker = () => {
+        return (<Picker
+            selectedValue={this.state.language}
+            style={{height: 50, width: 100}}
+            onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
+            <Picker.Item label="Java" value="java"/>
+            <Picker.Item label="JavaScript" value="js"/>
+        </Picker>);
+    };
+
+    renderPreloader =() => (
+        <ActivityIndicator
+            size="small"
+            style={[styles.settingsPreLoader]}
+            color={palette.color4}/>
+    );
 
     renderUserInfo = () => {
         const {user} = this.props;
@@ -202,6 +237,7 @@ class SettingsMainScreen extends React.Component {
 
         setUser({
             ...user,
+            justSignIn: false,
             updatedAt: Date.now(),
             patient,
         });
@@ -223,8 +259,8 @@ class SettingsMainScreen extends React.Component {
 
 
     render() {
+        console.log(this.props);
 
-        this.checkFirstSettings();
 
         return (<SafeAreaView style={[styles.settings]}>
 
@@ -233,6 +269,8 @@ class SettingsMainScreen extends React.Component {
                 {this.renderUserInfo()}
 
                 {this.renderPatientSelector()}
+
+                {this.renderPatients()}
 
             </ScrollView>
 
@@ -329,6 +367,9 @@ const styles = StyleSheet.create({
     settingsLineWrap: {
         flex: 1,
     },
+    settingsPreLoader: {
+        alignSelf: 'center',
+    }
 });
 
 export default SettingsMainScreen;

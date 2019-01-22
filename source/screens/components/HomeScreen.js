@@ -22,7 +22,7 @@ class HomeScreen extends React.Component {
     checkPatient = () => {
         const {user} = this.props;
 
-        if( user.patient === null ) this.props.navigation.navigate('SettingsMain', {
+        if( user.justSignIn ) this.props.navigation.navigate('SettingsMain', {
             itemId: 'settingsMainProps',
             backButton: false });
     };

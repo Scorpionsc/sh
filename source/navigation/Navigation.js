@@ -8,10 +8,12 @@ import AuthLoadingScreenContainer from '../screens/containers/AuthLoadingScreenC
 import CalculatorScreenContainer from "../screens/containers/CalculatorScreenContainer";
 import HomeScreenContainer from '../screens/containers/HomeScreenContainer';
 import FoodScreenContainer from "../screens/containers/FoodScreenContainer";
+import MoreScreenContainer from "../screens/containers/MoreScreenContainer";
 import SettingsMainScreenContainer from "../screens/containers/SettingsMainScreenContainer";
-
-import MoreScreen from "../screens/components/MoreScreen";
-import SettingsScreen from "../screens/components/SettingsScreen";
+import ProductsScreen from "../screens/components/ProductsScreen";
+import ProductsScreenContainer from "../screens/containers/ProductsScreenContainer";
+import DishesScreenContainer from "../screens/containers/DishesScreenContainer";
+import MenusScreenContainer from "../screens/containers/MenusScreenContainer";
 
 const defaultNavigationOptions = {
     headerStyle: {
@@ -78,6 +80,9 @@ CalculatorStack.navigationOptions = hideTabBar;
 
 const FoodStack = createStackNavigator({
         Food: FoodScreenContainer,
+        Products: ProductsScreenContainer,
+        Dishes: DishesScreenContainer,
+        Menus: MenusScreenContainer,
     },
     {
         defaultNavigationOptions,
@@ -85,8 +90,7 @@ const FoodStack = createStackNavigator({
 FoodStack.navigationOptions = hideTabBar;
 
 const MoreStack = createStackNavigator({
-        More: MoreScreen,
-        Settings: SettingsScreen,
+        More: MoreScreenContainer,
         SettingsMain: SettingsMainScreenContainer,
     },
     {

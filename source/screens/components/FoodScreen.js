@@ -1,36 +1,30 @@
 import React from "react";
-import { SafeAreaView, Text, StyleSheet } from "react-native";
-import PropTypes from "prop-types";
-import palette from "../../palette";
+import MenuScreen from "./MenuScreen";
 
-class FoodScreen extends React.Component {
+class FoodScreen extends MenuScreen {
 
-    static propTypes = {
-        user: PropTypes.object.isRequired,
+    state = {
+        menuSections: [
+            {
+                title: 'FOOD TYPES',
+                data: [
+                    {
+                        title: 'Products',
+                        route: 'Products',
+                    },
+                    {
+                        title: 'Dishes',
+                        route: 'Dishes',
+                    },
+                    {
+                        title: 'Menus',
+                        route: 'Menus',
+                    },
+                ],
+            }
+        ]
     };
-
-    static navigationOptions = { header: null };
-
-    render() {
-        return (
-            <SafeAreaView style={[styles.food]}>
-                <Text style={[styles.temp]}>Food screen in progress...</Text>
-            </SafeAreaView>
-        );
-    }
 }
 
-const styles = StyleSheet.create({
-    temp: {
-        color: palette.color2,
-    },
-    food: {
-        flex: 1,
-        backgroundColor: palette.color3,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
-
-});
 
 export default FoodScreen;
