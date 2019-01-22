@@ -16,9 +16,9 @@ export const fetchUser = async (dispatch) => {
         dispatch(setUser(user));
     }
 
-    subscribeDBUser(user, dispatch, fistFetch);
+    // subscribeDBUser(user, dispatch, fistFetch);
 
-    return user;
+    return null;
 };
 
 export const setJustRegister = (state) => {
@@ -40,20 +40,17 @@ const fetchLocalUser = async () => {
 
     await AsyncStorage.removeItem(`@SHStore:user`);
     let user = await AsyncStorage.getItem(`@SHStore:user`);
-    let fistFetch = false;
 
     if (!user) {
         fistFetch = true;
         user = await googleSignIn();
+        user.justSignIn = true;
         await AsyncStorage.setItem(`@SHStore:user`, JSON.stringify(user));
     } else {
         user = JSON.parse(user);
     }
 
-    return {
-        user,
-        fistFetch
-    };
+    return user;
 };
 
 const googleSignIn = async () => {
