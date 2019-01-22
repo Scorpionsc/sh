@@ -85,7 +85,10 @@ class SettingsMainScreen extends React.Component {
             patient: props.user.patient === null ? true : props.user.patient,
             shouldRenderHome: false,
         };
-        this.props.navigation.setParams({handleSave: this.saveSettings});
+        this.props.navigation.setParams({
+            handleSave: this.saveSettings,
+            backButton: !props.user.justSignIn
+        });
 
         this.subscribeBackButton();
 

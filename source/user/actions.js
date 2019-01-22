@@ -10,12 +10,11 @@ export const SET_JUST_REGISTER = 'SET_JUST_REGISTER';
 export const fetchUser = async (dispatch) => {
     const localUser = await fetchLocalUser();
 
-
     if(!localUser.justSignIn){
-        dispatch(setUser(user));
+        dispatch(setUser(localUser));
     }
 
-    // subscribeDBUser(user, dispatch, fistFetch);
+    subscribeDBUser(localUser, dispatch);
 
     return null;
 };
@@ -87,11 +86,11 @@ const googleSignIn = async () => {
 const onUserSnapshot = (fistFetch, localUser, userRef, dispatch) => snapshot => {
     const dbUser = snapshot.val();
 
-    if(dbUser && fistFetch){
+    if (!dbUser){
+        dispatch(setUser(localUser));
+    } else if(dbUser && localUser.justSignIn){
         AsyncStorage.setItem(`@SHStore:user`, JSON.stringify(dbUser));
         dispatch(setUser(dbUser));
-    } else if (!dbUser && fistFetch){
-        dispatch(setUser(localUser));
     } else {
         syncUser(localUser, dbUser, userRef).then((result) => {
             if(result.isLocalUserChanged){
@@ -109,13 +108,13 @@ const setUserRef = (userRef) => {
     }
 };
 
-const subscribeDBUser = (localUser, dispatch, fistFetch) => {
+const subscribeDBUser = (localUser, dispatch) => {
 
     const userRef = firebase.database().ref(`users/${localUser.uid}`);
 
     dispatch(setUserRef(userRef));
 
-    userRef.on('value', onUserSnapshot(fistFetch, localUser, userRef, dispatch));
+    userRef.on('value', onUserSnapshot(localUser, userRef, dispatch));
 
 };
 
