@@ -1,5 +1,5 @@
 import React from "react";
-import {StyleSheet, SectionList, SafeAreaView, Text, View} from "react-native";
+import {StyleSheet, SectionList, SafeAreaView, Text, View, Platform} from "react-native";
 import palette from "../../palette";
 import MenuItem from "../../menuItem/MenuItem";
 import PropTypes from "prop-types";
@@ -20,18 +20,28 @@ class MoreScreen extends React.Component {
                     {
                         title: 'Main Settings',
                         route: 'SettingsMain',
-                        role: 'all',
                     },
                     {
                         title: 'Bluetooth connection',
                         route: 'Bluetooth',
                         role: 'patient',
+                        platform: 'android',
                     },
                 ],
             }
         ]
     };
 
+
+    checkPermission = (user, menuItem) => {
+
+        return this.checkRolePermission(user, menuItem) && this.checkPlatformPermission(menuItem);
+
+    };
+
+    checkRolePermission = (user, menuItem) => (!menuItem.role || ( menuItem.role === 'patient' && user.patient ));
+
+    checkPlatformPermission = (menuItem) => (!menuItem.platform || ( Platform.OS === menuItem.platform ));
 
     onItemClick = (itemData) => {
 
@@ -53,7 +63,7 @@ class MoreScreen extends React.Component {
 
         const {user} = this.props;
 
-        return item.role === 'all' || ( item.role === 'patient' && user.patient )
+        return this.checkPermission(user, item)
             ? <MenuItem key={index} data={item} onClick={this.onItemClick}/>
             : null;
     };

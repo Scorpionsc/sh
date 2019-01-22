@@ -8,26 +8,37 @@ export const SET_JUST_REGISTER = 'SET_JUST_REGISTER';
 
 
 export const fetchUser = async (dispatch) => {
-
     const localUserData = await fetchLocalUser();
 
     const { user, fistFetch } = localUserData;
 
-    dispatch(setUser(user));
-
-    if(fistFetch){
-        dispatch(setJustRegister(true));
+    if(!fistFetch){
+        dispatch(setUser(user));
     }
 
     subscribeDBUser(user, dispatch, fistFetch);
 
     return user;
+};
 
+export const setJustRegister = (state) => {
+    return {
+        type: SET_JUST_REGISTER,
+        payload: state
+    }
+};
+
+export const setUser = (user) => {
+    return {
+        type: SET_USER,
+        payload: user
+    }
 };
 
 
 const fetchLocalUser = async () => {
 
+    await AsyncStorage.removeItem(`@SHStore:user`);
     let user = await AsyncStorage.getItem(`@SHStore:user`);
     let fistFetch = false;
 
@@ -54,7 +65,7 @@ const googleSignIn = async () => {
 
         const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken);
 
-        const currentUser = await firebase.auth().signInAndRetrieveDataWithCredential(credential);
+        const currentUser = await firebase.auth().signInWithCredential(credential);
 
         if (currentUser) {
             const {displayName, email, photoURL, uid} = currentUser.user.toJSON();
@@ -85,14 +96,14 @@ const googleSignIn = async () => {
     }
 };
 
-const onUserSnapshot = (fistFetch, localUser, userRef)=> snapshot => {
+const onUserSnapshot = (fistFetch, localUser, userRef, dispatch) => snapshot => {
     const dbUser = snapshot.val();
 
     if(dbUser && fistFetch){
-
         AsyncStorage.setItem(`@SHStore:user`, JSON.stringify(dbUser));
         dispatch(setUser(dbUser));
-
+    } else if (!dbUser && fistFetch){
+        dispatch(setUser(localUser));
     } else {
         syncUser(localUser, dbUser, userRef).then((result) => {
             if(result.isLocalUserChanged){
@@ -102,19 +113,6 @@ const onUserSnapshot = (fistFetch, localUser, userRef)=> snapshot => {
     }
 };
 
-const setJustRegister = (state) => {
-    return {
-        type: SET_JUST_REGISTER,
-        payload: state
-    }
-};
-
-const setUser = (user) => {
-    return {
-        type: SET_USER,
-        payload: user
-    }
-};
 
 const setUserRef = (userRef) => {
     return {
@@ -129,7 +127,7 @@ const subscribeDBUser = (localUser, dispatch, fistFetch) => {
 
     dispatch(setUserRef(userRef));
 
-    userRef.on('value', onUserSnapshot(fistFetch, localUser, userRef));
+    userRef.on('value', onUserSnapshot(fistFetch, localUser, userRef, dispatch));
 
 };
 
@@ -143,7 +141,6 @@ const syncUser = async (localUser, dbUser, userRef) => {
         user = localUser;
         isDbUserChanged = true;
     } else {
-
         if (localUser.updatedAt > dbUser.updatedAt) {
             isDbUserChanged = true;
             user = localUser;
@@ -151,10 +148,10 @@ const syncUser = async (localUser, dbUser, userRef) => {
             isLocalUserChanged = true;
             user = dbUser;
         }
-
     }
 
     if (isDbUserChanged) userRef.set(user);
+
     if (isLocalUserChanged) await AsyncStorage.setItem(`@SHStore:user`, JSON.stringify(user));
 
     return {

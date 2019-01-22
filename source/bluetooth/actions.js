@@ -169,7 +169,12 @@ const getBleManager = (getState, dispatch) => {
     if (state.bluetooth.bleManager) {
         bleManager = state.bluetooth.bleManager;
     } else {
-        bleManager = new BleManager();
+        bleManager = new BleManager({
+            restoreStateIdentifier: 'bleBackgroundMode',
+            restoreStateFunction: bleRestoredState => {
+                console.log(bleRestoredState);
+            }
+        });
         dispatch(setBleManager(bleManager));
     }
 

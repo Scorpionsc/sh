@@ -31,22 +31,22 @@ export const updateLocalRawData = async (newDataItem) => {
 };
 
 
-export const fetchRawData = (dispatch, getState) => {
+export const fetchRawData = (dispatch, getState, month, user) => {
 
-    AsyncStorage.getItem(`@SHStore:rawData`).then(rawDataString => {
+    AsyncStorage.getItem(`@SHStore:${user}.${month}`).then(rawDataString => {
         const rawData = rawDataString
             ? JSON.parse(rawDataString)
             : null;
 
         dispatch(setRawData(rawData));
 
-        subscribeDBRawData(dispatch, getState);
+        subscribeDBRawData(dispatch, getState, month);
     });
 
 
 };
 
-const subscribeDBRawData = (dispatch, getState) => {
+const subscribeDBRawData = (dispatch, getState, month, user) => {
 
     const state = getState();
     const userId = state.userData.user.uid;

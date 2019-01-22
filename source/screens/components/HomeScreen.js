@@ -22,6 +22,9 @@ class HomeScreen extends React.Component {
     checkPatient = () => {
         const {user} = this.props;
 
+        console.log(user);
+
+
         if( user.patient === null ) this.props.navigation.navigate('SettingsMain', {
             itemId: 'settingsMainProps',
             backButton: false });

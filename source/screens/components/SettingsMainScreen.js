@@ -25,21 +25,6 @@ class SettingsMainScreen extends React.Component {
         setUser: PropTypes.func.isRequired,
     };
 
-    static getDerivedStateFromProps = (nextProps) => {
-
-        const {justRegister, user, setJustRegister} = nextProps;
-
-        if (justRegister && user.patient !== null) {
-            setJustRegister(false);
-
-            return {
-                shouldRenderHome: true,
-            }
-        }
-
-        return null;
-    };
-
     static navigationOptions = ({navigation}) => {
         const {params} = navigation.state;
         const options = {

@@ -15,6 +15,8 @@ export default (state = initialState, action) => {
             return {...state, userRef: action.payload };
         case SET_USER:
             if(state.userRef){
+                console.log(100);
+
                 state.userRef.set(action.payload);
             }
             AsyncStorage.setItem(`@SHStore:user`, JSON.stringify(action.payload));

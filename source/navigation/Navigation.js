@@ -105,7 +105,7 @@ const BottomNavTabs = createBottomTabNavigator({
         More: MoreStack,
     },
     {
-        initialRouteName: 'More',
+        initialRouteName: 'Home',
         defaultNavigationOptions: ({ navigation }) => ({
             tabBarIcon: ({ focused, horizontal, tintColor }) => getTabBarIcon(navigation, focused, tintColor),
         }),

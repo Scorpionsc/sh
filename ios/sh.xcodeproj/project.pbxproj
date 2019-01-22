@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -56,6 +57,7 @@
 		B9BD38027804B4E3D4AB7AF0 /* libPods-shTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7479104F2B8EE40E1EDF8AB9 /* libPods-shTests.a */; };
 		BC8343B075984645A190CA12 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 638FFEFEE27B4C748E8A2EA9 /* Octicons.ttf */; };
 		C40263B021EFBADA00C6C100 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C40263AF21EFBADA00C6C100 /* GoogleService-Info.plist */; };
+		C413D91021F3BB84002C92CF /* bleplx.swift in Sources */ = {isa = PBXBuildFile; fileRef = C413D90F21F3BB84002C92CF /* bleplx.swift */; };
 		CAEDA9E7F5A647BC9327888B /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 428DA9539F1B4E128B47E992 /* MaterialCommunityIcons.ttf */; };
 		D68DC3C0C33E4F2BBD8A7745 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A199203015744BBBAE7D840 /* Entypo.ttf */; };
 		F87F044B71014EF9BE2ACA58 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D5B90F9B5288471F865744BB /* Ionicons.ttf */; };
@@ -413,6 +415,8 @@
 		AF82BBEDA5DC4F2FAE956CF6 /* libRNGoogleSignin.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNGoogleSignin.a; sourceTree = "<group>"; };
 		B3A3E53EB88B4BD3BDE09564 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		C40263AF21EFBADA00C6C100 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "sh/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		C413D90E21F3BB83002C92CF /* sh-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "sh-Bridging-Header.h"; sourceTree = "<group>"; };
+		C413D90F21F3BB84002C92CF /* bleplx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bleplx.swift; sourceTree = "<group>"; };
 		CFF3643E3D8F40F7ADE12BE8 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		D5B90F9B5288471F865744BB /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		D9F4A66C54F5460B838DA9C6 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
@@ -702,6 +706,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				C413D90F21F3BB84002C92CF /* bleplx.swift */,
 				13B07FAE1A68108700A75B9A /* sh */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* shTests */,
@@ -710,6 +715,7 @@
 				C4687D2121E162C800A539E7 /* Recovered References */,
 				2C931D09D82B97A4E12B8D9A /* Pods */,
 				6338700F1FC04BE4B1ED3D2C /* Resources */,
+				C413D90E21F3BB83002C92CF /* sh-Bridging-Header.h */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -874,6 +880,12 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = J44254S8LN;
+						LastSwiftMigration = 1010;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -1459,6 +1471,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				C413D91021F3BB84002C92CF /* bleplx.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1511,6 +1524,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 47CBF169A749FBEE3140CED0 /* Pods-shTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = J44254S8LN;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1546,6 +1560,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EA8423A8AC4BD0F0E410A299 /* Pods-shTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = J44254S8LN;
@@ -1579,6 +1594,7 @@
 			baseConfigurationReference = A916CD881F3B0B9E8E5E2C5D /* Pods-sh.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = J44254S8LN;
@@ -1601,6 +1617,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = sh;
+				SWIFT_OBJC_BRIDGING_HEADER = "sh-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1610,6 +1629,7 @@
 			baseConfigurationReference = DBE8DB515B191BCBF164B8DD /* Pods-sh.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = J44254S8LN;
 				HEADER_SEARCH_PATHS = (
@@ -1631,6 +1651,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = sh;
+				SWIFT_OBJC_BRIDGING_HEADER = "sh-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
