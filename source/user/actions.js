@@ -42,7 +42,6 @@ const fetchLocalUser = async () => {
     let user = await AsyncStorage.getItem(`@SHStore:user`);
 
     if (!user) {
-        fistFetch = true;
         user = await googleSignIn();
         user.justSignIn = true;
         await AsyncStorage.setItem(`@SHStore:user`, JSON.stringify(user));
