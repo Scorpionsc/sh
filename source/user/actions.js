@@ -8,24 +8,16 @@ export const SET_JUST_REGISTER = 'SET_JUST_REGISTER';
 
 
 export const fetchUser = async (dispatch) => {
-    const localUserData = await fetchLocalUser();
+    const localUser = await fetchLocalUser();
 
-    const { user, fistFetch } = localUserData;
 
-    if(!fistFetch){
+    if(!localUser.justSignIn){
         dispatch(setUser(user));
     }
 
     // subscribeDBUser(user, dispatch, fistFetch);
 
     return null;
-};
-
-export const setJustRegister = (state) => {
-    return {
-        type: SET_JUST_REGISTER,
-        payload: state
-    }
 };
 
 export const setUser = (user) => {
