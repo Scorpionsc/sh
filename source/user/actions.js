@@ -50,7 +50,7 @@ export const setUsers = (users) => ({
 
 
 const fetchLocalUser = async () => {
-
+    await AsyncStorage.removeItem(`@SHStore:user`);
     let user = await AsyncStorage.getItem(`@SHStore:user`);
 
     if (!user) {
