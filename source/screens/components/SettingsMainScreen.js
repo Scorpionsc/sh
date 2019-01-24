@@ -10,14 +10,11 @@ import {
     Image,
     ScrollView,
     Switch,
-    TouchableOpacity,
-    TouchableNativeFeedback,
     BackHandler,
-    Platform,
     Picker,
 } from 'react-native';
-import Icon from "react-native-vector-icons/Ionicons";
 import {StackActions, NavigationActions} from 'react-navigation';
+import RoundButton from "../../roundButton/RoundButton";
 
 class SettingsMainScreen extends React.Component {
 
@@ -35,51 +32,19 @@ class SettingsMainScreen extends React.Component {
         const options = {
             title: 'Main Settings',
             tabBarVisible: false,
-            headerRight: Platform.OS === 'ios'
-                ? (
-                    <View>
-                        <TouchableOpacity style={[styles.settingsHeadButtonWrapIOS]}
-                                          onPress={() => params.handleSave()}>
-                            <Icon
-                                name='ios-checkmark'
-                                color={palette.color2}
-                                size={40}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                )
-                : (
-                    <TouchableNativeFeedback
-                        onPress={params.handleSave}
-                        background={TouchableNativeFeedback.SelectableBackground()}
-                        borderRadius={20}
-                    >
-                        <View style={styles.settingsHeadButton}>
-                            <Icon
-                                name='md-checkmark'
-                                color={palette.color2}
-                                size={35}
-                                onPress={() => params.handleSave()}
-                            />
-                        </View>
-
-                    </TouchableNativeFeedback>
-                ),
+            headerRight: (<RoundButton androidName="md-checkmark" iosName="ios-checkmark" onPress={() => params.handleSave()}/>),
         };
 
         if (params) {
-
             return params && params.backButton
                 ? options
                 : {
                     ...options,
                     headerLeft: null,
                 };
-
         } else {
             return options
         }
-
     };
 
 
@@ -96,7 +61,7 @@ class SettingsMainScreen extends React.Component {
 
         this.subscribeBackButton();
 
-        this.getUsers();
+        // this.getUsers();
 
     }
 
@@ -123,10 +88,10 @@ class SettingsMainScreen extends React.Component {
     }
 
 
-    getUsers = () => {
-        const {fetchUsers, usersLoading, users} = this.props;
-        if( !usersLoading && !users.length ) fetchUsers();
-    };
+    // getUsers = () => {
+    //     const {fetchUsers, usersLoading, users} = this.props;
+    //     if( !usersLoading && !users.length ) fetchUsers();
+    // };
 
     onBackButtonPressAndroid = () => {
         const {navigation} = this.props;
@@ -235,6 +200,8 @@ class SettingsMainScreen extends React.Component {
         const {setUser, user} = this.props;
         const {patient} = this.state;
 
+        console.log(user);
+
         setUser({
             ...user,
             justSignIn: false,
@@ -259,9 +226,6 @@ class SettingsMainScreen extends React.Component {
 
 
     render() {
-        console.log(this.props);
-
-
         return (<SafeAreaView style={[styles.settings]}>
 
             <ScrollView style={[styles.settingsWrap]}>
@@ -270,12 +234,9 @@ class SettingsMainScreen extends React.Component {
 
                 {this.renderPatientSelector()}
 
-                {this.renderPatients()}
-
             </ScrollView>
 
         </SafeAreaView>);
-
     }
 
 }

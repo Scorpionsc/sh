@@ -19,7 +19,7 @@ export const fetchUser = async (dispatch) => {
 
     subscribeDBUser(localUser, dispatch);
 
-    return null;
+    return localUser;
 };
 
 export const fetchUsers = () => (dispatch) => {
@@ -34,7 +34,6 @@ export const fetchUsers = () => (dispatch) => {
         }
 
         subscribeDBUsers(users, dispatch);
-        console.log(users);
     });
 };
 

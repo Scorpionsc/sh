@@ -14,6 +14,7 @@ import ProductsScreen from "../screens/components/ProductsScreen";
 import ProductsScreenContainer from "../screens/containers/ProductsScreenContainer";
 import DishesScreenContainer from "../screens/containers/DishesScreenContainer";
 import MenusScreenContainer from "../screens/containers/MenusScreenContainer";
+import ProductFabricScreenContainer from "../screens/containers/ProductFabricScreenContainer";
 
 const defaultNavigationOptions = {
     headerStyle: {
@@ -83,6 +84,7 @@ const FoodStack = createStackNavigator({
         Products: ProductsScreenContainer,
         Dishes: DishesScreenContainer,
         Menus: MenusScreenContainer,
+        ProductFabric: ProductFabricScreenContainer,
     },
     {
         defaultNavigationOptions,

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { fetchData } from '../../dataStorage/actions';
+import { fetchData } from '../../store/dataStorage/actions';
 import AuthLoadingScreen from './../components/AuthLoadingScreen'
 
 const mapStateToProps = state => ({

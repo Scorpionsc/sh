@@ -1,34 +1,37 @@
 import React from "react";
-import { SafeAreaView, Text, StyleSheet } from "react-native";
 import PropTypes from "prop-types";
-import palette from "../../palette";
+import SearchFilterScreen from "./SearchFilterScreen";
+import RoundButton from "../../roundButton/RoundButton";
 
-class ProductsScreen extends React.Component {
+class ProductsScreen extends SearchFilterScreen {
 
     static propTypes = {
         user: PropTypes.object.isRequired,
     };
 
-    static navigationOptions = {
-        title: 'Products',
-        tabBarVisible: false,
+    static navigationOptions = ({navigation}) => {
+        const {params} = navigation.state;
+
+        return options = {
+            title: 'Products',
+            tabBarVisible: false,
+            headerRight: (<RoundButton androidName="md-add" iosName="ios-add" onPress={() => params.handleHeaderButton()}/>),
+        };
     };
 
-    render() {
-        return (
-            <SafeAreaView style={[styles.products]}>
-            </SafeAreaView>
-        );
-    }
-}
 
-const styles = StyleSheet.create({
-    products: {
-        flex: 1,
-        backgroundColor: palette.color3,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
-});
+
+    componentDidMount() {
+        const {navigation} = this.props;
+        navigation.setParams({handleHeaderButton: () => this.addProduct()});
+    }
+
+
+    addProduct = () => {
+        const {navigation} = this.props;
+        navigation.navigate('ProductFabric');
+    };
+
+}
 
 export default ProductsScreen;
