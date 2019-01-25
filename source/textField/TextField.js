@@ -7,17 +7,28 @@ import palette from "../palette";
 class TextField extends React.Component {
 
     static propTypes = {
+        editable: PropTypes.bool,
         keyboardType: PropTypes.string,
         label: PropTypes.string,
+        multiline: PropTypes.bool,
+        numberOfLines: PropTypes.number,
+        required: PropTypes.bool,
         style: PropTypes.object,
+        value: PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.string,
+        ]),
 
         onChangeText: PropTypes.func,
         onSubmitEditing: PropTypes.func,
     };
 
     static defaultProps = {
+        editable: true,
         keyboardType: null,
         label: null,
+        multiline: false,
+        numberOfLines: 1,
         style: null,
 
         onChangeText: () => {},
@@ -30,14 +41,30 @@ class TextField extends React.Component {
 
         this.state = {
             inputRef: React.createRef(),
+            touched: false,
         };
 
     }
 
 
+    checkValidity = () => {
+        console.log(30);
+
+        const {required, value} = this.props;
+        const {touched} = this.state;
+
+        return (required && touched) ? !value : false;
+    };
+
     onChangeText = (text) => {
         const {onChangeText} = this.props;
         onChangeText(text);
+    };
+
+    onBlur = () => {
+        this.setState({
+            touched: true,
+        });
     };
 
     onSubmitEditing = (text) => {
@@ -53,24 +80,40 @@ class TextField extends React.Component {
 
     render() {
 
-        const {label, style, keyboardType} = this.props;
+        const {
+            label,
+            style,
+            keyboardType,
+            multiline,
+            numberOfLines,
+            value,
+            editable
+        } = this.props;
         const {inputRef} = this.state;
-
+        const invalid = this.checkValidity();
         const textFieldStyles = [styles.textField];
+        const labelStyles = [styles.textFieldLabel];
 
         if (style) textFieldStyles.push(style);
+
+        if (invalid) labelStyles.push(styles.textFieldError);
 
         return (
             <View style={textFieldStyles}>
                 {
                     label
-                    && <Text style={styles.textFieldLabel} onPress={this.focus}>{label}</Text>
+                    && <Text style={labelStyles} onPress={this.focus}>{label}</Text>
                 }
                 <TextInput
                     style={styles.textFieldInput}
                     ref={inputRef}
+                    multiline={multiline}
+                    editable={editable}
+                    numberOfLines={numberOfLines}
                     keyboardType={keyboardType}
+                    value={value}
                     onSubmitEditing={this.onSubmitEditing}
+                    onBlur={this.onBlur}
                     onChangeText={this.onChangeText}/>
 
             </View>
@@ -96,6 +139,9 @@ const styles = StyleSheet.create({
         color: palette.color2,
         padding: 0,
 
+    },
+    textFieldError: {
+        color: palette.color7,
     },
 });
 

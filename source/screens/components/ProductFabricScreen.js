@@ -21,14 +21,42 @@ class ProductFabricScreen extends React.Component {
         };
     };
 
+    static getDerivedStateFromProps(props, state) {
+
+        console.log(props, state);
+
+        if (props.product) {
+            return {
+                ...state,
+                product: props.product,
+            }
+        }
+        return state;
+    }
+
 
     constructor(props) {
         super(props);
 
         this.state = {
-            productNameRef: React.createRef(),
-            caloriesRef: React.createRef(),
-            proteinsRef: React.createRef(),
+            product: {
+                calories: '',
+                carbohydrates: '',
+                description: '',
+                fats: '',
+                gi: '',
+                name: '',
+                proteins: '',
+            },
+            refs: {
+                caloriesRef: React.createRef(),
+                carbohydratesRef: React.createRef(),
+                descriptionRef: React.createRef(),
+                fatsRef: React.createRef(),
+                giRef: React.createRef(),
+                productNameRef: React.createRef(),
+                proteinsRef: React.createRef(),
+            },
         };
 
     }
@@ -42,39 +70,141 @@ class ProductFabricScreen extends React.Component {
 
 
     onCaloriesChanged = (calories) => {
-        console.log(calories);
+        this.setState({
+            product: {
+                ...this.state.product,
+                calories,
+            }
+        });
     };
 
     onCaloriesSubmitEditing = () => {
-        const {proteinsRef} = this.state;
+        const {proteinsRef} = this.state.refs;
         proteinsRef.current.focus();
     };
 
+    onCarbohydratesChanged = (carbohydrates) => {
+        this.setState({
+            product: {
+                ...this.state.product,
+                carbohydrates,
+            }
+        });
+    };
+
+    onCarbohydratesSubmitEditing = () => {
+        const {giRef} = this.state.refs;
+        giRef.current.focus();
+    };
+
+    onDescriptionChanged = (description) => {
+        this.setState({
+            product: {
+                ...this.state.product,
+                description,
+            }
+        });
+    };
+
+    onFatsChanged = (fats) => {
+        this.setState({
+            product: {
+                ...this.state.product,
+                fats,
+            }
+        });
+    };
+
+    onFatsSubmitEditing = () => {
+        const {carbohydratesRef} = this.state.refs;
+        carbohydratesRef.current.focus();
+    };
+
+    onGiChanged = (gi) => {
+        this.setState({
+            product: {
+                ...this.state.product,
+                gi,
+            }
+        });
+    };
+
+    onGiSubmitEditing = () => {
+        const {descriptionRef} = this.state.refs;
+        descriptionRef.current.focus();
+    };
+
     onProductNameChanged = (productName) => {
-        console.log(productName);
+        this.setState({
+            product: {
+                ...this.state.product,
+                name: productName,
+            }
+        });
     };
 
     onProductNameSubmitEditing = () => {
-        const {caloriesRef} = this.state;
+        const {caloriesRef} = this.state.refs;
         caloriesRef.current.focus();
     };
 
     onProteinsChanged = (proteins) => {
-        console.log(proteins);
+        this.setState({
+            product: {
+                ...this.state.product,
+                proteins,
+            }
+        });
     };
 
     onProteinsSubmitEditing = () => {
-        console.log('onProteinsSubmitEditing');
+        const {fatsRef} = this.state.refs;
+        fatsRef.current.focus();
     };
 
     saveSettings = () => {
-        console.log(889);
+        const {product} = this.state;
+
+        const valid = this.validateAll();
+        console.log(valid);
+        console.log(product);
+    };
+
+    validateAll = () => {
+        const {refs} = this.state;
+        let invalid = false;
+
+        Object.keys(refs).forEach(key => {
+            console.log(key);
+
+            if(!invalid) invalid = refs[key].current.checkValidity();
+        });
+
+        if(invalid){
+            this.forceUpdate();
+        }
+
+        return !invalid;
 
     };
 
 
     render() {
-        const {productNameRef, caloriesRef, proteinsRef} = this.state;
+        const {
+            refs,
+            product,
+        } = this.state;
+
+        const {
+            productNameRef,
+            proteinsRef,
+            carbohydratesRef,
+            caloriesRef,
+            descriptionRef,
+            fatsRef,
+            giRef,
+        } = refs;
+
 
         return (
             <SafeAreaView style={styles.productFabric}>
@@ -83,20 +213,58 @@ class ProductFabricScreen extends React.Component {
                         style={styles.productFabricLine}
                         label={'Product name:'}
                         ref={productNameRef}
+                        required={true}
+                        value={product.name}
                         onSubmitEditing={this.onProductNameSubmitEditing}
                         onChangeText={this.onProductNameChanged}/>
                     <TextField
                         label={'Calories(kcal):'}
                         ref={caloriesRef}
+                        value={product.calories}
+                        required={true}
                         keyboardType={'number-pad'}
                         onSubmitEditing={this.onCaloriesSubmitEditing}
                         onChangeText={this.onCaloriesChanged}/>
                     <TextField
                         label={'Proteins(g):'}
                         ref={proteinsRef}
+                        value={product.proteins}
+                        required={true}
                         keyboardType={'number-pad'}
                         onSubmitEditing={this.onProteinsSubmitEditing}
                         onChangeText={this.onProteinsChanged}/>
+                    <TextField
+                        label={'Fats(g):'}
+                        ref={fatsRef}
+                        value={product.fats}
+                        required={true}
+                        keyboardType={'number-pad'}
+                        onSubmitEditing={this.onFatsSubmitEditing}
+                        onChangeText={this.onFatsChanged}/>
+                    <TextField
+                        label={'Carbohydrates(g):'}
+                        ref={carbohydratesRef}
+                        value={product.carbohydrates}
+                        required={true}
+                        keyboardType={'number-pad'}
+                        onSubmitEditing={this.onCarbohydratesSubmitEditing}
+                        onChangeText={this.onCarbohydratesChanged}/>
+                    <TextField
+                        label={'GI:'}
+                        ref={giRef}
+                        value={product.gi}
+                        required={true}
+                        keyboardType={'number-pad'}
+                        onSubmitEditing={this.onGiSubmitEditing}
+                        onChangeText={this.onGiChanged}/>
+                    <TextField
+                        label={'Description:'}
+                        ref={descriptionRef}
+                        value={product.description}
+                        multiline = {true}
+                        numberOfLines = {4}
+                        editable = {true}
+                        onChangeText={this.onDescriptionChanged}/>
                 </ScrollView>
             </SafeAreaView>
         );
