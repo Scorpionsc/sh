@@ -21,8 +21,6 @@ export default (state = initialState, action) => {
         case SET_JUST_REGISTER:
             return {...state, justRegister: action.payload };
         case SET_USER:
-            console.log(state.userRef);
-
             if(state.userRef){
                 state.userRef.set(action.payload);
             }

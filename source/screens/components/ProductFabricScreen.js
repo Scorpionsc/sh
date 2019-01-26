@@ -8,46 +8,31 @@ import PropTypes from "prop-types";
 import palette from "../../palette";
 import RoundButton from "../../roundButton/RoundButton";
 import TextField from "../../textField/TextField";
+import MainPreLoader from "../../mainPreLoader/MainPreLoader";
 
 
 class ProductFabricScreen extends React.Component {
+
+    static propTypes = {
+        addProduct: PropTypes.func.isRequired,
+    };
 
     static navigationOptions = ({navigation}) => {
         const {params} = navigation.state;
         return options = {
             title: 'Add products',
             tabBarVisible: false,
-            headerRight: (<RoundButton androidName="md-checkmark" iosName="ios-checkmark" onPress={() => params.handleSave()}/>),
+            headerRight: (
+                <RoundButton androidName="md-checkmark" iosName="ios-checkmark" onPress={() => params.handleSave()}/>),
         };
     };
-
-    static getDerivedStateFromProps(props, state) {
-
-        console.log(props, state);
-
-        if (props.product) {
-            return {
-                ...state,
-                product: props.product,
-            }
-        }
-        return state;
-    }
 
 
     constructor(props) {
         super(props);
 
         this.state = {
-            product: {
-                calories: '',
-                carbohydrates: '',
-                description: '',
-                fats: '',
-                gi: '',
-                name: '',
-                proteins: '',
-            },
+            product: this.getProductFromNav(),
             refs: {
                 caloriesRef: React.createRef(),
                 carbohydratesRef: React.createRef(),
@@ -59,15 +44,29 @@ class ProductFabricScreen extends React.Component {
             },
         };
 
+        this.addHeaderHandler();
+
     }
 
-    componentDidMount() {
+    addHeaderHandler = () => {
         const {navigation} = this.props;
 
         navigation.setParams({handleSave: () => this.saveSettings()});
+    };
 
-    }
+    getProductFromNav = () => {
+        const {navigation} = this.props;
 
+        return navigation.getParam('product', {
+            calories: '',
+            carbohydrates: '',
+            description: '',
+            fats: '',
+            gi: '',
+            name: '',
+            proteins: '',
+        });
+    };
 
     onCaloriesChanged = (calories) => {
         this.setState({
@@ -163,28 +162,42 @@ class ProductFabricScreen extends React.Component {
     };
 
     saveSettings = () => {
+        const {addProduct, navigation} = this.props;
         const {product} = this.state;
 
-        const valid = this.validateAll();
-        console.log(valid);
-        console.log(product);
+
+        if (this.validateAll()) {
+            const itemId = navigation.getParam('productId', Date.now());
+            const newProduct = {};
+
+            newProduct[itemId] = product;
+            newProduct[itemId].updatedAt = Date.now();
+
+            addProduct(newProduct);
+        }
+
     };
 
     validateAll = () => {
         const {refs} = this.state;
-        let invalid = false;
+        const {product} = this.state;
+        const productKeys = Object.keys(product);
+
+        let valid = true;
 
         Object.keys(refs).forEach(key => {
-            console.log(key);
-
-            if(!invalid) invalid = refs[key].current.checkValidity();
+            refs[key].current.setTouched();
         });
 
-        if(invalid){
-            this.forceUpdate();
+        for (let i = 0; i < productKeys.length; i++) {
+            const key = productKeys[i];
+            if (key !== 'description') {
+                valid = !(product[key] === '');
+                if (!valid) break;
+            }
         }
 
-        return !invalid;
+        return valid;
 
     };
 
@@ -261,14 +274,15 @@ class ProductFabricScreen extends React.Component {
                         label={'Description:'}
                         ref={descriptionRef}
                         value={product.description}
-                        multiline = {true}
-                        numberOfLines = {4}
-                        editable = {true}
+                        multiline={true}
+                        numberOfLines={4}
+                        editable={true}
                         onChangeText={this.onDescriptionChanged}/>
                 </ScrollView>
             </SafeAreaView>
         );
     }
+
 }
 
 const styles = StyleSheet.create({

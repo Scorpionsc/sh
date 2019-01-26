@@ -48,12 +48,15 @@ class TextField extends React.Component {
 
 
     checkValidity = () => {
-        console.log(30);
-
         const {required, value} = this.props;
         const {touched} = this.state;
 
         return (required && touched) ? !value : false;
+    };
+
+    focus = () => {
+        const {inputRef} = this.state;
+        inputRef.current.focus();
     };
 
     onChangeText = (text) => {
@@ -72,9 +75,10 @@ class TextField extends React.Component {
         onSubmitEditing(text);
     };
 
-    focus = () => {
-        const {inputRef} = this.state;
-        inputRef.current.focus();
+    setTouched = () => {
+        this.setState({
+            touched: true,
+        });
     };
 
 
