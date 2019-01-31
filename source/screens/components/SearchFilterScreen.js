@@ -63,6 +63,8 @@ class SearchFilterScreen extends React.Component {
         deleteItem(id);
     };
 
+    onItemClick=(data)=>{};
+
     onSearchTextChange = (text) => {
         const {menuItems} = this.props;
         this.setState({

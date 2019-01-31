@@ -3,27 +3,54 @@ import {
     StyleSheet,
     SafeAreaView,
     ScrollView,
+    View,
 } from "react-native";
 import PropTypes from "prop-types";
 import palette from "../../palette";
 import RoundButton from "../../roundButton/RoundButton";
 import TextField from "../../textField/TextField";
-import MainPreLoader from "../../mainPreLoader/MainPreLoader";
 
 
 class ProductFabricScreen extends React.Component {
 
     static propTypes = {
-        addProduct: PropTypes.func.isRequired,
+        addProduct: PropTypes.func,
+    };
+
+    static defaultProps = {
+        addProduct: () => {
+        },
     };
 
     static navigationOptions = ({navigation}) => {
         const {params} = navigation.state;
+        const mode = navigation.getParam('mode', 'add');
+        const title = mode === 'add' ? 'Add product' : mode === 'edit' ? 'Edit product' : null;
+
         return options = {
-            title: 'Add products',
+            title,
             tabBarVisible: false,
-            headerRight: (
-                <RoundButton androidName="md-checkmark" iosName="ios-checkmark" onPress={() => params.handleSave()}/>),
+            headerRight: mode === 'view'
+                ? (
+                    <View>
+                        <RoundButton androidName="md-create" iosName="ios-create" size={30}
+                                     onPress={() => params.handleEdit()}/>
+                    </View>
+                )
+                : (
+                    <View style={styles.productFabricHeaderButtons}>
+                        {
+                            mode === 'edit'
+                            && (
+                                <RoundButton androidName="md-close" iosName="ios-close"
+                                             onPress={() => params.handleCancel()}/>
+                            )
+                        }
+
+                        <RoundButton androidName="md-checkmark" iosName="ios-checkmark"
+                                     onPress={() => params.handleSave()}/>
+                    </View>
+                ),
         };
     };
 
@@ -42,6 +69,7 @@ class ProductFabricScreen extends React.Component {
                 productNameRef: React.createRef(),
                 proteinsRef: React.createRef(),
             },
+            mode: this.getModeFromNav(),
         };
 
         this.addHeaderHandler();
@@ -52,6 +80,14 @@ class ProductFabricScreen extends React.Component {
         const {navigation} = this.props;
 
         navigation.setParams({handleSave: () => this.saveSettings()});
+        navigation.setParams({handleEdit: () => this.toEditMode()});
+        navigation.setParams({handleCancel: () => this.toViewMode()});
+    };
+
+    getModeFromNav = () => {
+        const {navigation} = this.props;
+
+        return navigation.getParam('mode', 'add');
     };
 
     getProductFromNav = () => {
@@ -66,6 +102,12 @@ class ProductFabricScreen extends React.Component {
             name: '',
             proteins: '',
         });
+    };
+
+    getProductIdFromNav = () => {
+        const {navigation} = this.props;
+
+        return navigation.getParam('productId', Date.now());
     };
 
     onCaloriesChanged = (calories) => {
@@ -161,21 +203,125 @@ class ProductFabricScreen extends React.Component {
         fatsRef.current.focus();
     };
 
+    renderEditMode = () => {
+        const {
+            refs,
+            product,
+        } = this.state;
+
+        const {
+            productNameRef,
+            proteinsRef,
+            carbohydratesRef,
+            caloriesRef,
+            descriptionRef,
+            fatsRef,
+            giRef,
+        } = refs;
+
+        return (
+            <ScrollView contentContainerStyle={styles.productFabricScroll}>
+                <TextField
+                    style={styles.productFabricLine}
+                    label={'Product name:'}
+                    ref={productNameRef}
+                    required={true}
+                    value={product.name}
+                    onSubmitEditing={this.onProductNameSubmitEditing}
+                    onChangeText={this.onProductNameChanged}/>
+                <TextField
+                    label={'Calories(kcal):'}
+                    ref={caloriesRef}
+                    value={product.calories}
+                    required={true}
+                    keyboardType={'number-pad'}
+                    onSubmitEditing={this.onCaloriesSubmitEditing}
+                    onChangeText={this.onCaloriesChanged}/>
+                <TextField
+                    label={'Proteins(g):'}
+                    ref={proteinsRef}
+                    value={product.proteins}
+                    required={true}
+                    keyboardType={'number-pad'}
+                    onSubmitEditing={this.onProteinsSubmitEditing}
+                    onChangeText={this.onProteinsChanged}/>
+                <TextField
+                    label={'Fats(g):'}
+                    ref={fatsRef}
+                    value={product.fats}
+                    required={true}
+                    keyboardType={'number-pad'}
+                    onSubmitEditing={this.onFatsSubmitEditing}
+                    onChangeText={this.onFatsChanged}/>
+                <TextField
+                    label={'Carbohydrates(g):'}
+                    ref={carbohydratesRef}
+                    value={product.carbohydrates}
+                    required={true}
+                    keyboardType={'number-pad'}
+                    onSubmitEditing={this.onCarbohydratesSubmitEditing}
+                    onChangeText={this.onCarbohydratesChanged}/>
+                <TextField
+                    label={'GI:'}
+                    ref={giRef}
+                    value={product.gi}
+                    required={true}
+                    keyboardType={'number-pad'}
+                    onSubmitEditing={this.onGiSubmitEditing}
+                    onChangeText={this.onGiChanged}/>
+                <TextField
+                    label={'Description:'}
+                    ref={descriptionRef}
+                    value={product.description}
+                    multiline={true}
+                    numberOfLines={4}
+                    editable={true}
+                    onChangeText={this.onDescriptionChanged}/>
+            </ScrollView>
+        );
+    };
+
     saveSettings = () => {
-        const {addProduct, navigation} = this.props;
+        const {addProduct} = this.props;
         const {product} = this.state;
 
-
         if (this.validateAll()) {
-            const itemId = navigation.getParam('productId', Date.now());
+            const itemId = this.getProductIdFromNav();
             const newProduct = {};
 
             newProduct[itemId] = product;
             newProduct[itemId].updatedAt = Date.now();
 
             addProduct(newProduct);
+
+            this.toViewMode(itemId);
         }
 
+    };
+
+    toEditMode = () => {
+
+        this.props.navigation.setParams({
+            mode: 'edit',
+        });
+
+        this.setState({
+            mode: 'edit',
+        });
+    };
+
+    toViewMode = (productId) => {
+        const newOptions = {
+            mode: 'view',
+        };
+
+        if(productId) newOptions.productId = productId;
+
+        this.props.navigation.setParams(newOptions);
+
+        this.setState({
+            mode: 'view',
+        });
     };
 
     validateAll = () => {
@@ -203,82 +349,17 @@ class ProductFabricScreen extends React.Component {
 
 
     render() {
-        const {
-            refs,
-            product,
-        } = this.state;
 
-        const {
-            productNameRef,
-            proteinsRef,
-            carbohydratesRef,
-            caloriesRef,
-            descriptionRef,
-            fatsRef,
-            giRef,
-        } = refs;
+        const { mode } = this.state;
 
 
         return (
             <SafeAreaView style={styles.productFabric}>
-                <ScrollView contentContainerStyle={styles.productFabricScroll}>
-                    <TextField
-                        style={styles.productFabricLine}
-                        label={'Product name:'}
-                        ref={productNameRef}
-                        required={true}
-                        value={product.name}
-                        onSubmitEditing={this.onProductNameSubmitEditing}
-                        onChangeText={this.onProductNameChanged}/>
-                    <TextField
-                        label={'Calories(kcal):'}
-                        ref={caloriesRef}
-                        value={product.calories}
-                        required={true}
-                        keyboardType={'number-pad'}
-                        onSubmitEditing={this.onCaloriesSubmitEditing}
-                        onChangeText={this.onCaloriesChanged}/>
-                    <TextField
-                        label={'Proteins(g):'}
-                        ref={proteinsRef}
-                        value={product.proteins}
-                        required={true}
-                        keyboardType={'number-pad'}
-                        onSubmitEditing={this.onProteinsSubmitEditing}
-                        onChangeText={this.onProteinsChanged}/>
-                    <TextField
-                        label={'Fats(g):'}
-                        ref={fatsRef}
-                        value={product.fats}
-                        required={true}
-                        keyboardType={'number-pad'}
-                        onSubmitEditing={this.onFatsSubmitEditing}
-                        onChangeText={this.onFatsChanged}/>
-                    <TextField
-                        label={'Carbohydrates(g):'}
-                        ref={carbohydratesRef}
-                        value={product.carbohydrates}
-                        required={true}
-                        keyboardType={'number-pad'}
-                        onSubmitEditing={this.onCarbohydratesSubmitEditing}
-                        onChangeText={this.onCarbohydratesChanged}/>
-                    <TextField
-                        label={'GI:'}
-                        ref={giRef}
-                        value={product.gi}
-                        required={true}
-                        keyboardType={'number-pad'}
-                        onSubmitEditing={this.onGiSubmitEditing}
-                        onChangeText={this.onGiChanged}/>
-                    <TextField
-                        label={'Description:'}
-                        ref={descriptionRef}
-                        value={product.description}
-                        multiline={true}
-                        numberOfLines={4}
-                        editable={true}
-                        onChangeText={this.onDescriptionChanged}/>
-                </ScrollView>
+                {
+                    mode === 'view'
+                        ? null
+                        : this.renderEditMode()
+                }
             </SafeAreaView>
         );
     }
@@ -296,6 +377,10 @@ const styles = StyleSheet.create({
     productFabricLine: {
         borderTopWidth: 1,
         alignSelf: 'stretch',
+    },
+    productFabricHeaderButtons: {
+        flexDirection: 'row',
+        alignItems: 'center'
     },
 });
 

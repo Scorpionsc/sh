@@ -24,8 +24,23 @@ class ProductsScreen extends SearchFilterScreen {
 
     addProduct = () => {
         const {navigation} = this.props;
-        navigation.navigate('ProductFabric');
+        navigation.navigate('ProductFabric', {
+            mode: 'add',
+        });
     };
+
+    onItemClick = (data) => {
+        const {navigation, menuItems} = this.props;
+        const product = {...menuItems.find(item=>item.id === data.id)};
+        delete product['id'];
+
+        navigation.navigate('ProductFabric', {
+            mode: 'view',
+            product,
+            productId: data.id,
+        });
+    };
+
 
 }
 

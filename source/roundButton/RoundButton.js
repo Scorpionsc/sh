@@ -10,11 +10,14 @@ class RoundButton extends React.Component {
     static propTypes = {
         androidName: PropTypes.string.isRequired,
         iosName: PropTypes.string.isRequired,
+        size: PropTypes.number,
 
         onPress: PropTypes.func,
     };
 
     static defaultProps = {
+        size: 40,
+
         onPress: () => {},
     };
 
@@ -25,7 +28,7 @@ class RoundButton extends React.Component {
     };
 
     render() {
-        const { androidName, iosName} = this.props;
+        const { androidName, iosName, size} = this.props;
         return Platform.OS === 'ios'
             ? (
                 <TouchableOpacity style={[styles.roundButtonIOS]}
@@ -33,7 +36,7 @@ class RoundButton extends React.Component {
                     <Icon
                         name={iosName}
                         color={palette.color2}
-                        size={40}
+                        size={size}
                     />
                 </TouchableOpacity>
             )
@@ -47,7 +50,7 @@ class RoundButton extends React.Component {
                         <Icon
                             name={androidName}
                             color={palette.color2}
-                            size={35}
+                            size={size}
                         />
                     </View>
 
