@@ -6,7 +6,11 @@ import palette from "../../palette";
 class MenusScreen extends React.Component {
 
     static propTypes = {
-        user: PropTypes.object.isRequired,
+        menuItems: PropTypes.object,
+    };
+
+    static defaultProps = {
+        menuItems: null,
     };
 
     static navigationOptions = {
