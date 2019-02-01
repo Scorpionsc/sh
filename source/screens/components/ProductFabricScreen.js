@@ -3,6 +3,7 @@ import {
     StyleSheet,
     SafeAreaView,
     ScrollView,
+    Text,
     View,
 } from "react-native";
 import PropTypes from "prop-types";
@@ -281,6 +282,60 @@ class ProductFabricScreen extends React.Component {
         );
     };
 
+    renderViewMode = () => {
+        const { product } = this.state;
+
+        return (
+            <View style={styles.productFabricView}>
+                <Text style={styles.productFabricViewTitle}>{ product.name }</Text>
+                <View style={styles.productFabricViewRow}>
+                    <Text style={styles.productFabricViewRowTitle}>Calories:</Text>
+                    <View  style={styles.productFabricViewValues}>
+                        <Text  style={styles.productFabricViewValue}>{ product.calories }</Text>
+                        <Text  style={styles.productFabricViewUnit}> kcal</Text>
+                    </View>
+                </View>
+                <View style={styles.productFabricViewRow}>
+                    <Text style={styles.productFabricViewRowTitle}>Proteins:</Text>
+                    <View  style={styles.productFabricViewValues}>
+                        <Text  style={styles.productFabricViewValue}>{ product.proteins }</Text>
+                        <Text  style={styles.productFabricViewUnit}> g</Text>
+                    </View>
+                </View>
+                <View style={styles.productFabricViewRow}>
+                    <Text style={styles.productFabricViewRowTitle}>Fats:</Text>
+                    <View  style={styles.productFabricViewValues}>
+                        <Text  style={styles.productFabricViewValue}>{ product.fats }</Text>
+                        <Text  style={styles.productFabricViewUnit}> g</Text>
+                    </View>
+                </View>
+                <View style={styles.productFabricViewRow}>
+                    <Text style={styles.productFabricViewRowTitle}>Carbohydrates:</Text>
+                    <View  style={styles.productFabricViewValues}>
+                        <Text  style={styles.productFabricViewValue}>{ product.carbohydrates }</Text>
+                        <Text  style={styles.productFabricViewUnit}> g</Text>
+                    </View>
+                </View>
+                <View style={styles.productFabricViewRow}>
+                    <Text style={styles.productFabricViewRowTitle}>GI:</Text>
+                    <View  style={styles.productFabricViewValues}>
+                        <Text  style={styles.productFabricViewValue}>{ product.gi }</Text>
+                        <Text  style={styles.productFabricViewUnit}> %</Text>
+                    </View>
+                </View>
+                {
+                    product.description
+                    && (
+                        <View style={styles.productFabricDescription}>
+                            <Text style={styles.productFabricDescriptionTitle}>Description:</Text>
+                            <Text  style={styles.productFabricDescriptionValue}>{ product.description }</Text>
+                        </View>
+                    )
+                }
+            </View>
+        );
+    };
+
     saveSettings = () => {
         const {addProduct} = this.props;
         const {product} = this.state;
@@ -352,12 +407,11 @@ class ProductFabricScreen extends React.Component {
 
         const { mode } = this.state;
 
-
         return (
             <SafeAreaView style={styles.productFabric}>
                 {
                     mode === 'view'
-                        ? null
+                        ? this.renderViewMode()
                         : this.renderEditMode()
                 }
             </SafeAreaView>
@@ -381,6 +435,61 @@ const styles = StyleSheet.create({
     productFabricHeaderButtons: {
         flexDirection: 'row',
         alignItems: 'center'
+    },
+    productFabricView: {
+        marginRight: 20,
+        marginLeft: 20,
+    },
+    productFabricViewTitle: {
+        color: palette.color2,
+        fontSize: 30,
+        paddingTop: 20,
+        paddingBottom: 20,
+
+    },
+    productFabricViewRow: {
+        alignSelf: 'stretch',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        borderColor: palette.color5,
+        borderTopWidth: 1,
+        paddingTop: 10,
+        paddingBottom: 10,
+    },
+    productFabricViewRowTitle: {
+        color: palette.color2,
+        fontSize: 18,
+        flex: 2,
+    },
+    productFabricViewValues: {
+        alignSelf: 'stretch',
+        flex: 3,
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+    },
+    productFabricViewValue: {
+        color: palette.color2,
+        fontSize: 20,
+    },
+    productFabricViewUnit: {
+        color: palette.color2,
+        fontSize: 16,
+    },
+    productFabricDescription: {
+        borderColor: palette.color5,
+        borderTopWidth: 1,
+        paddingTop: 20,
+    },
+    productFabricDescriptionTitle: {
+        fontSize: 18,
+        color: palette.color2,
+        marginBottom: 10,
+    },
+    productFabricDescriptionValue: {
+        color: palette.color2,
+        fontSize: 16,
     },
 });
 
