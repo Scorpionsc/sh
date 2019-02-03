@@ -1,4 +1,4 @@
-import {connect} from 'react-redux';
+ import {connect} from 'react-redux';
 import ProductsScreen from "../components/ProductsScreen";
 import {removeProduct} from "../../store/products/actions";
 import {bindActionCreators} from "redux";
