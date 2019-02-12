@@ -15,11 +15,8 @@ const mapStateToProps = state => {
 };
 
 
-const mapActionsToProps = (dispatch) => {
-    return {
-        deleteItem: bindActionCreators(removeProduct, dispatch),
-
-    }
-};
+const mapActionsToProps = (dispatch) => ({
+    deleteItem: bindActionCreators(removeProduct, dispatch),
+});
 
 export default connect(mapStateToProps, mapActionsToProps)(ProductsScreen);

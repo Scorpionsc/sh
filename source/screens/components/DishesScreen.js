@@ -1,34 +1,45 @@
 import React from "react";
-import { SafeAreaView, Text, StyleSheet } from "react-native";
-import PropTypes from "prop-types";
-import palette from "../../palette";
+import SearchFilterScreen from "./SearchFilterScreen";
+import RoundButton from "../../roundButton/RoundButton";
 
-class DishesScreen extends React.Component {
+class DishesScreen extends SearchFilterScreen {
 
-    static propTypes = {
-        user: PropTypes.object.isRequired,
+    static navigationOptions = ({navigation}) => {
+        const {params} = navigation.state;
+
+        return {
+            title: 'Dishes',
+            tabBarVisible: false,
+            headerRight: (<RoundButton androidName="md-add" iosName="ios-add" onPress={() => params.handleHeaderButton()}/>),
+        };
     };
 
-    static navigationOptions = {
-        title: 'Dishes',
-        tabBarVisible: false,
-    };
 
-    render() {
-        return (
-            <SafeAreaView style={[styles.dishes]}>
-            </SafeAreaView>
-        );
+    componentDidMount() {
+        const {navigation} = this.props;
+        navigation.setParams({handleHeaderButton: () => this.addDish()});
     }
-}
 
-const styles = StyleSheet.create({
-    dishes: {
-        flex: 1,
-        backgroundColor: palette.color3,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
-});
+
+    addDish = () => {
+        const {navigation} = this.props;
+        navigation.navigate('DishFabric', {
+            mode: 'add',
+        });
+    };
+
+    onItemClick = (data) => {
+        const {navigation, menuItems} = this.props;
+        const dish = {...menuItems.find(item=>item.id === data.id)};
+        delete dish['id'];
+
+        navigation.navigate('DishFabric', {
+            mode: 'view',
+            dish,
+            dishId: data.id,
+        });
+    };
+    
+}
 
 export default DishesScreen;

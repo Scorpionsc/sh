@@ -1,13 +1,22 @@
 import { connect } from 'react-redux';
 import DishesScreen from "../components/DishesScreen";
+import {bindActionCreators} from "redux";
+import {removeDish} from "../../store/dishes/actions";
 
-const mapStateToProps = state => ({
-    user: state.userData.user,
+const mapStateToProps = state => {
+    const { dishes } = state.dishesData;
+
+    return ({
+        menuItems: dishes ? Object.keys(dishes).map(key => ({
+            ...state.dishesData.dishes[key],
+            id: key,
+        })) : [],
+    })
+};
+
+const mapActionsToProps = (dispatch) => ({
+    deleteItem: bindActionCreators(removeDish, dispatch),
 });
 
-
-const mapActionsToProps = (dispatch) => {
-    return {}
-};
 
 export default connect(mapStateToProps, mapActionsToProps)(DishesScreen);

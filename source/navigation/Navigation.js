@@ -10,11 +10,11 @@ import HomeScreenContainer from '../screens/containers/HomeScreenContainer';
 import FoodScreenContainer from "../screens/containers/FoodScreenContainer";
 import MoreScreenContainer from "../screens/containers/MoreScreenContainer";
 import SettingsMainScreenContainer from "../screens/containers/SettingsMainScreenContainer";
-import ProductsScreen from "../screens/components/ProductsScreen";
 import ProductsScreenContainer from "../screens/containers/ProductsScreenContainer";
 import DishesScreenContainer from "../screens/containers/DishesScreenContainer";
 import MenusScreenContainer from "../screens/containers/MenusScreenContainer";
 import ProductFabricScreenContainer from "../screens/containers/ProductFabricScreenContainer";
+import DishFabricScreenContainer from "../screens/containers/DishFabricScreenContainer";
 
 const defaultNavigationOptions = {
     headerStyle: {
@@ -85,6 +85,7 @@ const FoodStack = createStackNavigator({
         Dishes: DishesScreenContainer,
         Menus: MenusScreenContainer,
         ProductFabric: ProductFabricScreenContainer,
+        DishFabric: DishFabricScreenContainer,
     },
     {
         defaultNavigationOptions,

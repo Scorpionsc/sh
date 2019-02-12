@@ -4,8 +4,6 @@ import RoundButton from "../../roundButton/RoundButton";
 
 class ProductsScreen extends SearchFilterScreen {
 
-
-
     static navigationOptions = ({navigation}) => {
         const {params} = navigation.state;
 
@@ -15,6 +13,7 @@ class ProductsScreen extends SearchFilterScreen {
             headerRight: (<RoundButton androidName="md-add" iosName="ios-add" onPress={() => params.handleHeaderButton()}/>),
         };
     };
+
 
     componentDidMount() {
         const {navigation} = this.props;
@@ -40,7 +39,6 @@ class ProductsScreen extends SearchFilterScreen {
             productId: data.id,
         });
     };
-
 
 }
 

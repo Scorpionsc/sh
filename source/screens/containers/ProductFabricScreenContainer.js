@@ -3,9 +3,7 @@ import ProductFabricScreen from "../components/ProductFabricScreen";
 import {bindActionCreators} from "redux";
 import {addProduct} from "../../store/products/actions";
 
-const mapStateToProps = state => ({
-    user: state.userData.user,
-});
+const mapStateToProps = () => ({});
 
 
 const mapActionsToProps = (dispatch) => (
