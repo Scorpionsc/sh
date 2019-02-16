@@ -1,45 +1,43 @@
-import React from "react";
-import SearchFilterScreen from "./SearchFilterScreen";
-import RoundButton from "../../roundButton/RoundButton";
+import React from 'react';
+import SearchFilterScreen from './SearchFilterScreen';
+import RoundButton from '../../roundButton/RoundButton';
 
 class ProductsScreen extends SearchFilterScreen {
+    static navigationOptions = ({ navigation }) => {
+      const { params } = navigation.state;
 
-    static navigationOptions = ({navigation}) => {
-        const {params} = navigation.state;
-
-        return {
-            title: 'Products',
-            tabBarVisible: false,
-            headerRight: (<RoundButton androidName="md-add" iosName="ios-add" onPress={() => params.handleHeaderButton()}/>),
-        };
+      return {
+        title: 'Products',
+        tabBarVisible: false,
+        headerRight: (<RoundButton androidName="md-add" iosName="ios-add" onPress={() => params.handleHeaderButton()}/>),
+      };
     };
 
 
     componentDidMount() {
-        const {navigation} = this.props;
-        navigation.setParams({handleHeaderButton: () => this.addProduct()});
+      const { navigation } = this.props;
+      navigation.setParams({ handleHeaderButton: () => this.addProduct() });
     }
 
 
     addProduct = () => {
-        const {navigation} = this.props;
-        navigation.navigate('ProductFabric', {
-            mode: 'add',
-        });
+      const { navigation } = this.props;
+      navigation.navigate('ProductFabric', {
+        mode: 'add',
+      });
     };
 
     onItemClick = (data) => {
-        const {navigation, menuItems} = this.props;
-        const product = {...menuItems.find(item=>item.id === data.id)};
-        delete product['id'];
+      const { navigation, menuItems } = this.props;
+      const product = { ...menuItems.find(item => item.id === data.id) };
+      delete product.id;
 
-        navigation.navigate('ProductFabric', {
-            mode: 'view',
-            product,
-            productId: data.id,
-        });
+      navigation.navigate('ProductFabric', {
+        mode: 'view',
+        product,
+        productId: data.id,
+      });
     };
-
 }
 
 export default ProductsScreen;

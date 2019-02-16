@@ -1,15 +1,27 @@
 import { connect } from 'react-redux';
-import DishFabricScreen from "../components/DishFabricScreen";
-import {bindActionCreators} from "redux";
-import {addDish} from "../../store/dishes/actions";
+import { bindActionCreators } from 'redux';
+import DishFabricScreen from '../components/DishFabricScreen';
+import { addDish } from '../../store/dishes/actions';
 
-const mapStateToProps = () => ({});
+const objectsToArray = items => (items ? Object.keys(items).map(key => ({
+  ...items[key],
+  id: key,
+})) : []);
 
+const mapStateToProps = (state) => {
+  const { products } = state.productsData;
+  const { dishes } = state.dishesData;
 
-const mapActionsToProps = (dispatch) => (
-    {
-        addDish: bindActionCreators(addDish, dispatch),
-    }
+  return {
+    products: objectsToArray(products),
+    dishes: objectsToArray(dishes),
+  };
+};
+
+const mapActionsToProps = dispatch => (
+  {
+    addDish: bindActionCreators(addDish, dispatch),
+  }
 );
 
 export default connect(mapStateToProps, mapActionsToProps)(DishFabricScreen);

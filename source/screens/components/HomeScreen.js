@@ -1,52 +1,55 @@
-import React from "react";
-import {SafeAreaView, Text, StyleSheet} from "react-native";
-import PropTypes from "prop-types";
-import palette from "../../palette";
+import React from 'react';
+import { SafeAreaView, Text, StyleSheet } from 'react-native';
+import PropTypes from 'prop-types';
+import palette from '../../palette';
 
 class HomeScreen extends React.Component {
-
     static propTypes = {
-        user: PropTypes.object.isRequired,
+      user: PropTypes.object.isRequired,
+      navigation: PropTypes.any,
     };
 
     static navigationOptions = { header: null };
 
 
-    constructor(props){
-        super(props);
+    constructor(props) {
+      super(props);
 
-        this.checkPatient();
+      this.checkPatient();
     }
 
 
     checkPatient = () => {
-        const {user} = this.props;
+      const { user } = this.props;
 
-        if( user.justSignIn ) this.props.navigation.navigate('SettingsMain', {
-            itemId: 'settingsMainProps',
-            backButton: false });
+      if (user.justSignIn) {
+        this.props.navigation.navigate('SettingsMain', {
+          itemId: 'settingsMainProps',
+          backButton: false,
+        });
+      }
     };
 
     render() {
-        return (
+      return (
             <SafeAreaView style={styles.home}>
                 <Text style={styles.temp}>Home Screen</Text>
             </SafeAreaView>
-        );
+      );
     }
 }
 
 
 const styles = StyleSheet.create({
-    temp: {
-        color: palette.color2,
-    },
-    home: {
-        flex: 1,
-        backgroundColor: palette.color3,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
+  temp: {
+    color: palette.color2,
+  },
+  home: {
+    flex: 1,
+    backgroundColor: palette.color3,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
 
 });
 

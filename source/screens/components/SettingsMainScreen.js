@@ -1,90 +1,176 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import palette from '../../palette';
 import {
-    StyleSheet,
-    SafeAreaView,
-    ActivityIndicator,
-    View,
-    Text,
-    Image,
-    ScrollView,
-    Switch,
-    BackHandler,
-    Picker,
+  StyleSheet,
+  SafeAreaView,
+  ActivityIndicator,
+  View,
+  Text,
+  Image,
+  ScrollView,
+  Switch,
+  BackHandler,
+  Picker,
 } from 'react-native';
-import {StackActions, NavigationActions} from 'react-navigation';
-import RoundButton from "../../roundButton/RoundButton";
+import { StackActions, NavigationActions } from 'react-navigation';
+import palette from '../../palette';
+import RoundButton from '../../roundButton/RoundButton';
+
+const styles = StyleSheet.create({
+  userInfo: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderColor: palette.color5,
+    borderBottomWidth: 1,
+    alignSelf: 'stretch',
+  },
+  userPhoto: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  userName: {
+    color: palette.color2,
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  userEmail: {
+    color: palette.color2,
+    fontSize: 14,
+  },
+  settings: {
+    flex: 1,
+    backgroundColor: palette.color3,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  settingsHeadButtonWrapIOS: {
+    marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.color5,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  settingsHeadButtonWrap: {
+    flex: 1,
+    overflow: 'hidden',
+    marginRight: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  settingsHeadButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.color5,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  settingsTitle: {
+    color: palette.color2,
+    fontSize: 20,
+    lineHeight: 50,
+  },
+  settingsWrap: {
+    marginRight: 20,
+    marginLeft: 20,
+    alignSelf: 'stretch',
+  },
+  settingsLineWrapLeft: {
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+  },
+  settingsLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingLeft: 5,
+    paddingRight: 5,
+    borderColor: palette.color5,
+    borderBottomWidth: 1,
+  },
+  settingsLabel: {
+    color: palette.color2,
+    fontSize: 20,
+  },
+  settingsLineWrap: {
+    flex: 1,
+  },
+  settingsPreLoader: {
+    alignSelf: 'center',
+  },
+});
 
 class SettingsMainScreen extends React.Component {
-
     static propTypes = {
-        user: PropTypes.object.isRequired,
-        users: PropTypes.array.isRequired,
-        usersLoading: PropTypes.bool.isRequired,
+      user: PropTypes.object.isRequired,
+      users: PropTypes.array.isRequired,
+      usersLoading: PropTypes.bool.isRequired,
 
-        fetchUsers: PropTypes.func.isRequired,
-        setUser: PropTypes.func.isRequired,
+      fetchUsers: PropTypes.func.isRequired,
+      setUser: PropTypes.func.isRequired,
     };
 
-    static navigationOptions = ({navigation}) => {
-        const {params} = navigation.state;
-        const options = {
-            title: 'Main Settings',
-            tabBarVisible: false,
-            headerRight: (<RoundButton androidName="md-checkmark" iosName="ios-checkmark" onPress={() => params.handleSave()}/>),
-        };
+    static navigationOptions = ({ navigation }) => {
+      const { params } = navigation.state;
+      const options = {
+        title: 'Main Settings',
+        tabBarVisible: false,
+        headerRight: (<RoundButton androidName="md-checkmark" iosName="ios-checkmark" onPress={() => params.handleSave()}/>),
+      };
 
-        if (params) {
-            return params && params.backButton
-                ? options
-                : {
-                    ...options,
-                    headerLeft: null,
-                };
-        } else {
-            return options
-        }
+      if (params) {
+        return params && params.backButton
+          ? options
+          : {
+            ...options,
+            headerLeft: null,
+          };
+      }
+      return options;
     };
 
 
     constructor(props) {
-        super(props);
+      super(props);
 
-        this.state = {
-            patient: props.user.patient === null ? true : props.user.patient,
-        };
-        this.props.navigation.setParams({
-            handleSave: this.saveSettings,
-            backButton: !props.user.justSignIn
-        });
+      this.state = {
+        patient: props.user.patient === null ? true : props.user.patient,
+      };
+      this.props.navigation.setParams({
+        handleSave: this.saveSettings,
+        backButton: !props.user.justSignIn,
+      });
 
-        this.subscribeBackButton();
+      this.subscribeBackButton();
 
-        // this.getUsers();
-
+      // this.getUsers();
     }
 
 
     componentDidMount() {
-        const {navigation} = this.props;
+      const { navigation } = this.props;
 
-        if (navigation.state.params && !navigation.state.params.backButton) {
-            this.props.navigation.setParams({handleSave: () => this.saveSettings()});
-            this.willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
-                BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
-            );
-        }
+      if (navigation.state.params && !navigation.state.params.backButton) {
+        this.props.navigation.setParams({ handleSave: () => this.saveSettings() });
+        this.willBlurSubscription = this.props.navigation.addListener('willBlur', payload => BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid));
+      }
     }
 
     componentWillUnmount() {
-        const {navigation} = this.props;
+      const { navigation } = this.props;
 
-        if (navigation.state.params && !navigation.state.params.backButton) {
-            this.didFocusSubscription && this.didFocusSubscription.remove();
-            this.willBlurSubscription && this.willBlurSubscription.remove();
-        }
-
+      if (navigation.state.params && !navigation.state.params.backButton) {
+        this.didFocusSubscription && this.didFocusSubscription.remove();
+        this.willBlurSubscription && this.willBlurSubscription.remove();
+      }
     }
 
 
@@ -94,29 +180,27 @@ class SettingsMainScreen extends React.Component {
     // };
 
     onBackButtonPressAndroid = () => {
-        const {navigation} = this.props;
+      const { navigation } = this.props;
 
-        return !navigation.state.params.backButton;
+      return !navigation.state.params.backButton;
     };
 
     onPatientStatusChange = (status) => {
-
-        this.setState({
-            patient: status,
-        });
-
+      this.setState({
+        patient: status,
+      });
     };
 
 
     renderPatients = () => {
-        const { usersLoading, users, user} = this.props;
+      const { usersLoading, users, user } = this.props;
 
-        return (<View style={[styles.settingsLine]}>
+      return (<View style={[styles.settingsLine]}>
 
             {
                 usersLoading
-                    ? this.renderPreloader()
-                    : (
+                  ? this.renderPreloader()
+                  : (
                         <React.Fragment>
                             <View style={[styles.settingsLineWrap]}>
                                 <Text style={[styles.settingsLabel]}>Follow:</Text>
@@ -126,18 +210,17 @@ class SettingsMainScreen extends React.Component {
                                 {this.renderPicker()}
                             </View>
                         </React.Fragment>
-                    )
+                  )
             }
-
 
 
         </View>);
     };
 
     renderPatientSelector = () => {
-        const {patient} = this.state;
+      const { patient } = this.state;
 
-        return (<View style={[styles.settingsLine]}>
+      return (<View style={[styles.settingsLine]}>
 
             <View style={[styles.settingsLineWrap]}>
                 <Text style={[styles.settingsLabel]}>Patient:</Text>
@@ -148,7 +231,7 @@ class SettingsMainScreen extends React.Component {
                     value={patient}
                     onValueChange={this.onPatientStatusChange}
                     trackColor={{
-                        true: palette.color4
+                      true: palette.color4,
                     }}
                     thumbColor={palette.color1}
                 />
@@ -157,15 +240,13 @@ class SettingsMainScreen extends React.Component {
         </View>);
     };
 
-    renderPicker = () => {
-        return (<Picker
+    renderPicker = () => (<Picker
             selectedValue={this.state.language}
-            style={{height: 50, width: 100}}
-            onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
+            style={{ height: 50, width: 100 }}
+            onValueChange={(itemValue, itemIndex) => this.setState({ language: itemValue })}>
             <Picker.Item label="Java" value="java"/>
             <Picker.Item label="JavaScript" value="js"/>
         </Picker>);
-    };
 
     renderPreloader =() => (
         <ActivityIndicator
@@ -175,12 +256,12 @@ class SettingsMainScreen extends React.Component {
     );
 
     renderUserInfo = () => {
-        const {user} = this.props;
-        const photoSrc = {
-            uri: user.photoURL
-        };
+      const { user } = this.props;
+      const photoSrc = {
+        uri: user.photoURL,
+      };
 
-        return (<View style={[styles.userInfo]}>
+      return (<View style={[styles.userInfo]}>
             <Image style={[styles.userPhoto]} source={photoSrc}/>
             <Text style={[styles.userName]}>{user.displayName}</Text>
             <Text style={[styles.userEmail]}>{user.email}</Text>
@@ -188,45 +269,43 @@ class SettingsMainScreen extends React.Component {
     };
 
     resetNavigation = () => {
-        const resetAction = StackActions.reset({
-            index: 0,
-            actions: [NavigationActions.navigate({routeName: 'More'})],
-        });
+      const resetAction = StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({ routeName: 'More' })],
+      });
 
-        this.props.navigation.dispatch(resetAction);
+      this.props.navigation.dispatch(resetAction);
     };
 
     saveSettings = () => {
-        const {setUser, user} = this.props;
-        const {patient} = this.state;
+      const { setUser, user } = this.props;
+      const { patient } = this.state;
 
-        console.log(user);
+      console.log(user);
 
-        setUser({
-            ...user,
-            justSignIn: false,
-            updatedAt: Date.now(),
-            patient,
-        });
+      setUser({
+        ...user,
+        justSignIn: false,
+        updatedAt: Date.now(),
+        patient,
+      });
 
-        this.resetNavigation();
+      this.resetNavigation();
 
-        this.props.navigation.navigate('Home');
+      this.props.navigation.navigate('Home');
     };
 
     subscribeBackButton = () => {
-        const {navigation} = this.props;
+      const { navigation } = this.props;
 
-        if (navigation.state.params && !navigation.state.params.backButton) {
-            this.didFocusSubscription = navigation.addListener('didFocus', () =>
-                BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
-            );
-        }
+      if (navigation.state.params && !navigation.state.params.backButton) {
+        this.didFocusSubscription = navigation.addListener('didFocus', () => BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid));
+      }
     };
 
 
     render() {
-        return (<SafeAreaView style={[styles.settings]}>
+      return (<SafeAreaView style={[styles.settings]}>
 
             <ScrollView style={[styles.settingsWrap]}>
 
@@ -238,99 +317,7 @@ class SettingsMainScreen extends React.Component {
 
         </SafeAreaView>);
     }
-
 }
 
-const styles = StyleSheet.create({
-    userInfo: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingTop: 20,
-        paddingBottom: 20,
-        borderColor: palette.color5,
-        borderBottomWidth: 1,
-        alignSelf: 'stretch',
-    },
-    userPhoto: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        marginBottom: 10,
-    },
-    userName: {
-        color: palette.color2,
-        fontSize: 18,
-        marginBottom: 5,
-    },
-    userEmail: {
-        color: palette.color2,
-        fontSize: 14,
-    },
-    settings: {
-        flex: 1,
-        backgroundColor: palette.color3,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
-    settingsHeadButtonWrapIOS: {
-        marginRight: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: palette.color5,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-    },
-    settingsHeadButtonWrap: {
-        flex: 1,
-        overflow: 'hidden',
-        marginRight: 10,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-    },
-    settingsHeadButton: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: palette.color5,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-    },
-    settingsTitle: {
-        color: palette.color2,
-        fontSize: 20,
-        lineHeight: 50,
-    },
-    settingsWrap: {
-        marginRight: 20,
-        marginLeft: 20,
-        alignSelf: 'stretch',
-    },
-    settingsLineWrapLeft: {
-        justifyContent: 'flex-end',
-        flexDirection: 'row',
-    },
-    settingsLine: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingTop: 20,
-        paddingBottom: 20,
-        paddingLeft: 5,
-        paddingRight: 5,
-        borderColor: palette.color5,
-        borderBottomWidth: 1,
-    },
-    settingsLabel: {
-        color: palette.color2,
-        fontSize: 20,
-    },
-    settingsLineWrap: {
-        flex: 1,
-    },
-    settingsPreLoader: {
-        alignSelf: 'center',
-    }
-});
 
 export default SettingsMainScreen;

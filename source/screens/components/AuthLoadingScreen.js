@@ -1,96 +1,87 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MainPreLoader from '../../mainPreLoader/MainPreLoader';
 import {
-    SafeAreaView,
-    NetInfo,
-    StyleSheet,
-} from 'react-native'
+  SafeAreaView,
+  NetInfo,
+  StyleSheet,
+} from 'react-native';
+import MainPreLoader from '../../mainPreLoader/MainPreLoader';
 import OfflineNotification from '../../notifications/offlineNotification';
 
+const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+  },
+});
+
 class AuthLoadingScreen extends React.Component {
-
     static propTypes = {
-        userUpdatedAt: PropTypes.number,
+      userUpdatedAt: PropTypes.number,
+      navigation: PropTypes.any,
 
-        fetchData: PropTypes.func.isRequired,
+      fetchData: PropTypes.func.isRequired,
     };
 
     static defaultProps = {
-        userUpdatedAt: null,
-        patient: null,
+      userUpdatedAt: null,
+      patient: null,
     };
 
     state = {
-        isConnected: true
+      isConnected: true,
     };
 
 
     constructor(props) {
-        super(props);
+      super(props);
 
-        this.props.fetchData();
-
+      this.props.fetchData();
     }
 
     componentDidMount() {
+      NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 
-        NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
-
-        this.checkAuth();
-
+      this.checkAuth();
     }
 
     componentWillUnmount() {
-        NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
+      NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
     }
 
     componentDidUpdate() {
-        this.checkAuth();
+      this.checkAuth();
     }
 
 
     checkAuth = () => {
+      const { userUpdatedAt } = this.props;
 
-        const {userUpdatedAt} = this.props;
-
-        if( userUpdatedAt ) this.props.navigation.navigate('App');
-
+      if (userUpdatedAt) this.props.navigation.navigate('App');
     };
 
     handleConnectivityChange = (isConnected) => {
-        this.setState({isConnected});
+      this.setState({ isConnected });
     };
 
     renderOfflineMessage = () => {
-        const {userUpdatedAt} = this.props;
-        const {isConnected} = this.state;
+      const { userUpdatedAt } = this.props;
+      const { isConnected } = this.state;
 
-        return !isConnected && !userUpdatedAt
-            ? <OfflineNotification/>
-            : null;
+      return !isConnected && !userUpdatedAt
+        ? <OfflineNotification/>
+        : null;
     };
 
 
     render() {
-
-        return (<SafeAreaView style={[styles.main]}>
+      return (<SafeAreaView style={[styles.main]}>
 
             {this.renderOfflineMessage()}
 
             <MainPreLoader/>
 
         </SafeAreaView>);
-
     }
-
 }
-
-const styles = StyleSheet.create({
-    main: {
-        flex: 1,
-    },
-});
-
 
 export default AuthLoadingScreen;

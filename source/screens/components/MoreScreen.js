@@ -1,22 +1,20 @@
-import React from "react";
-import MenuScreen from "./MenuScreen";
+import React from 'react';
+import MenuScreen from './MenuScreen';
 
 class MoreScreen extends MenuScreen {
-
     state = {
-        menuSections: [
+      menuSections: [
+        {
+          title: 'SETTINGS',
+          data: [
             {
-                title: 'SETTINGS',
-                data: [
-                    {
-                        title: 'Main Settings',
-                        route: 'SettingsMain',
-                    },
-                ],
-            }
-        ]
+              title: 'Main Settings',
+              route: 'SettingsMain',
+            },
+          ],
+        },
+      ],
     };
-
 }
 
 export default MoreScreen;
