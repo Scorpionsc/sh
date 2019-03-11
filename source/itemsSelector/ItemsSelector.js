@@ -50,7 +50,6 @@ class ItemsSelector extends React.Component {
     searchText: '',
   };
 
-
   onSearchTextChange = (text) => {
     this.setState({
       searchText: text,
@@ -65,7 +64,6 @@ class ItemsSelector extends React.Component {
       onItemSelect(data);
     }
   };
-
 
   close = () => {
     const { onClose } = this.props;

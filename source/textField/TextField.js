@@ -1,108 +1,135 @@
-import React from "react";
-import {Text, StyleSheet, View, TextInput} from "react-native";
-import PropTypes from "prop-types";
-import palette from "../palette";
+import React from 'react';
+import {
+  Text, StyleSheet, View, TextInput,
+} from 'react-native';
+import PropTypes from 'prop-types';
+import palette from '../palette';
 
+const styles = StyleSheet.create({
+  textField: {
+    backgroundColor: palette.color5,
+    borderColor: palette.color6,
+    borderBottomWidth: 1,
+    borderRightWidth: 1,
+    borderLeftWidth: 1,
+    padding: 5,
+  },
+  textFieldLabel: {
+    fontSize: 16,
+    color: palette.color2,
+  },
+  textFieldInput: {
+    fontSize: 16,
+    color: palette.color2,
+    padding: 0,
+
+  },
+  textFieldError: {
+    color: palette.color7,
+  },
+});
 
 class TextField extends React.Component {
-
     static propTypes = {
-        editable: PropTypes.bool,
-        keyboardType: PropTypes.string,
-        label: PropTypes.string,
-        multiline: PropTypes.bool,
-        numberOfLines: PropTypes.number,
-        required: PropTypes.bool,
-        style: PropTypes.object,
-        value: PropTypes.oneOfType([
-            PropTypes.number,
-            PropTypes.string,
-        ]),
+      editable: PropTypes.bool,
+      keyboardType: PropTypes.string,
+      label: PropTypes.string,
+      multiline: PropTypes.bool,
+      numberOfLines: PropTypes.number,
+      required: PropTypes.bool,
+      style: PropTypes.object,
+      value: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.string,
+      ]),
 
-        onChangeText: PropTypes.func,
-        onSubmitEditing: PropTypes.func,
+      onChangeText: PropTypes.func,
+      onSubmitEditing: PropTypes.func,
+      onBlur: PropTypes.func,
     };
 
     static defaultProps = {
-        editable: true,
-        keyboardType: null,
-        label: null,
-        multiline: false,
-        numberOfLines: 1,
-        style: null,
+      editable: true,
+      keyboardType: null,
+      label: null,
+      multiline: false,
+      numberOfLines: 1,
+      style: null,
 
-        onChangeText: () => {},
-        onSubmitEditing: () => {},
+      onChangeText: () => {},
+      onSubmitEditing: () => {},
+      onBlur: () => {},
     };
 
 
     constructor(props) {
-        super(props);
+      super(props);
 
-        this.state = {
-            inputRef: React.createRef(),
-            touched: false,
-        };
-
+      this.state = {
+        inputRef: React.createRef(),
+        touched: false,
+      };
     }
 
 
     checkValidity = () => {
-        const {required, value} = this.props;
-        const {touched} = this.state;
+      const { required, value } = this.props;
+      const { touched } = this.state;
 
-        return (required && touched) ? !value : false;
+      return (required && touched) ? !value : false;
     };
 
     focus = () => {
-        const {inputRef} = this.state;
-        inputRef.current.focus();
+      const { inputRef } = this.state;
+      inputRef.current.focus();
     };
 
-    onChangeText = (text) => {
-        const {onChangeText} = this.props;
-        onChangeText(text);
+    onChangeText = (text) => {1
+      const { onChangeText } = this.props;
+      onChangeText(text);
     };
 
     onBlur = () => {
-        this.setState({
-            touched: true,
-        });
+      const { onBlur, value } = this.props;
+      this.setState({
+        touched: true,
+      });
+
+      onBlur(value);
     };
 
     onSubmitEditing = (text) => {
-        const {onSubmitEditing} = this.props;
-        onSubmitEditing(text);
+      const { onSubmitEditing } = this.props;
+      onSubmitEditing(text);
     };
 
     setTouched = () => {
-        this.setState({
-            touched: true,
-        });
+      this.setState({
+        touched: true,
+      });
     };
 
 
     render() {
+      const {
+        label,
+        style,
+        keyboardType,
+        multiline,
+        numberOfLines,
+        value,
+        editable,
+      } = this.props;
+      const { inputRef } = this.state;
+      const invalid = this.checkValidity();
+      const textFieldStyles = [styles.textField];
+      const labelStyles = [styles.textFieldLabel];
 
-        const {
-            label,
-            style,
-            keyboardType,
-            multiline,
-            numberOfLines,
-            value,
-            editable
-        } = this.props;
-        const {inputRef} = this.state;
-        const invalid = this.checkValidity();
-        const textFieldStyles = [styles.textField];
-        const labelStyles = [styles.textFieldLabel];
+      if (style) textFieldStyles.push(style);
 
-        if (style) textFieldStyles.push(style);
+      if (invalid) labelStyles.push(styles.textFieldError);
 
-        if (invalid) labelStyles.push(styles.textFieldError);
-
-        return (
+      return (
             <View style={textFieldStyles}>
                 {
                     label
@@ -121,32 +148,9 @@ class TextField extends React.Component {
                     onChangeText={this.onChangeText}/>
 
             </View>
-        );
+      );
     }
 }
 
-const styles = StyleSheet.create({
-    textField: {
-        backgroundColor: palette.color5,
-        borderColor: palette.color6,
-        borderBottomWidth: 1,
-        borderRightWidth: 1,
-        borderLeftWidth: 1,
-        padding: 5,
-    },
-    textFieldLabel: {
-        fontSize: 16,
-        color: palette.color2,
-    },
-    textFieldInput: {
-        fontSize: 16,
-        color: palette.color2,
-        padding: 0,
-
-    },
-    textFieldError: {
-        color: palette.color7,
-    },
-});
 
 export default TextField;

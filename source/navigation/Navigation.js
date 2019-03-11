@@ -11,10 +11,10 @@ import FoodScreenContainer from "../screens/containers/FoodScreenContainer";
 import MoreScreenContainer from "../screens/containers/MoreScreenContainer";
 import SettingsMainScreenContainer from "../screens/containers/SettingsMainScreenContainer";
 import ProductsScreenContainer from "../screens/containers/ProductsScreenContainer";
-import DishesScreenContainer from "../screens/containers/DishesScreenContainer";
+import DishesScreenContainer from "../dishes/containers/DishesScreenContainer";
 import MenusScreenContainer from "../screens/containers/MenusScreenContainer";
 import ProductFabricScreenContainer from "../screens/containers/ProductFabricScreenContainer";
-import DishFabricScreenContainer from "../screens/containers/DishFabricScreenContainer";
+import DishFabricScreenContainer from "../dishes/containers/DishFabricScreenContainer";
 
 const defaultNavigationOptions = {
     headerStyle: {

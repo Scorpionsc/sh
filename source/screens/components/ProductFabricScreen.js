@@ -136,7 +136,6 @@ class ProductFabricScreen extends React.Component {
     this.state = {
       product: this.getProductFromNav(),
       refs: {
-        caloriesRef: React.createRef(),
         carbohydratesRef: React.createRef(),
         descriptionRef: React.createRef(),
         fatsRef: React.createRef(),
@@ -145,6 +144,11 @@ class ProductFabricScreen extends React.Component {
         proteinsRef: React.createRef(),
       },
       mode: this.getModeFromNav(),
+      foodForce: {
+        proteins: 4,
+        carbohydrates: 4,
+        fats: 9,
+      },
     };
 
     this.addHeaderHandler();
@@ -159,6 +163,17 @@ class ProductFabricScreen extends React.Component {
     navigation.setParams({ handleCancel: () => this.toViewMode() });
   };
 
+  calculateCalories = (product) => {
+    const { foodForce } = this.state;
+
+    const fatsCalories = (Number(product.fats) * foodForce.fats);
+    const proteinsCalories = (Number(product.proteins) * foodForce.proteins);
+    const carbohydratesCalories = (Number(product.carbohydrates) * foodForce.carbohydrates);
+
+
+    return fatsCalories + proteinsCalories + carbohydratesCalories;
+  };
+
   getModeFromNav = () => {
     const { navigation } = this.props;
 
@@ -169,7 +184,6 @@ class ProductFabricScreen extends React.Component {
     const { navigation } = this.props;
 
     return navigation.getParam('product', {
-      calories: '',
       carbohydrates: '',
       description: '',
       fats: '',
@@ -183,20 +197,6 @@ class ProductFabricScreen extends React.Component {
     const { navigation } = this.props;
 
     return navigation.getParam('productId', Date.now());
-  };
-
-  onCaloriesChanged = (calories) => {
-    this.setState({
-      product: {
-        ...this.state.product,
-        calories,
-      },
-    });
-  };
-
-  onCaloriesSubmitEditing = () => {
-    const { proteinsRef } = this.state.refs;
-    proteinsRef.current.focus();
   };
 
   onCarbohydratesChanged = (carbohydrates) => {
@@ -260,8 +260,8 @@ class ProductFabricScreen extends React.Component {
   };
 
   onProductNameSubmitEditing = () => {
-    const { caloriesRef } = this.state.refs;
-    caloriesRef.current.focus();
+    const { proteinsRef } = this.state.refs;
+    proteinsRef.current.focus();
   };
 
   onProteinsChanged = (proteins) => {
@@ -288,7 +288,6 @@ class ProductFabricScreen extends React.Component {
       productNameRef,
       proteinsRef,
       carbohydratesRef,
-      caloriesRef,
       descriptionRef,
       fatsRef,
       giRef,
@@ -304,14 +303,6 @@ class ProductFabricScreen extends React.Component {
           value={product.name}
           onSubmitEditing={this.onProductNameSubmitEditing}
           onChangeText={this.onProductNameChanged}/>
-        <TextField
-          label={'Calories(kcal):'}
-          ref={caloriesRef}
-          value={product.calories}
-          required={true}
-          keyboardType={'number-pad'}
-          onSubmitEditing={this.onCaloriesSubmitEditing}
-          onChangeText={this.onCaloriesChanged}/>
         <TextField
           label={'Proteins(g):'}
           ref={proteinsRef}
@@ -365,7 +356,7 @@ class ProductFabricScreen extends React.Component {
         <View style={styles.productFabricViewRow}>
           <Text style={styles.productFabricViewRowTitle}>Calories:</Text>
           <View style={styles.productFabricViewValues}>
-            <Text style={styles.productFabricViewValue}>{product.calories}</Text>
+            <Text style={styles.productFabricViewValue}>{this.calculateCalories(product)}</Text>
             <Text style={styles.productFabricViewUnit}> kcal</Text>
           </View>
         </View>
@@ -398,7 +389,7 @@ class ProductFabricScreen extends React.Component {
           </View>
         </View>
         {
-          product.description
+          product.description !== ''
           && (
             <View style={styles.productFabricDescription}>
               <Text style={styles.productFabricDescriptionTitle}>Description:</Text>
@@ -476,6 +467,8 @@ class ProductFabricScreen extends React.Component {
 
   render() {
     const { mode } = this.state;
+
+    console.log(mode);
 
     return (
       <SafeAreaView style={styles.productFabric}>

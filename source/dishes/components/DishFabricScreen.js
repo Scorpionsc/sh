@@ -9,10 +9,11 @@ import {
   View,
 } from 'react-native';
 import PropTypes from 'prop-types';
-import palette from '../../palette';
+import palette from '../../palette/index';
 import RoundButton from '../../roundButton/RoundButton';
 import TextField from '../../textField/TextField';
 import ItemsSelector from '../../itemsSelector/ItemsSelector';
+import DishCalculations from './DishCalculations';
 
 const styles = StyleSheet.create({
   dishFabric: {
@@ -55,9 +56,19 @@ const styles = StyleSheet.create({
     color: palette.color2,
     fontSize: 16,
   },
+  dishFabricItemFirst: {
+    borderTopWidth: 1,
+    alignSelf: 'stretch',
+  },
+  dishFabricAddButtonWrap: {
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
 });
 
 class DishFabricScreen extends React.Component {
+  ingredientsRefs = {};
+
   static propTypes = {
     dishes: PropTypes.arrayOf(PropTypes.shape),
     products: PropTypes.arrayOf(PropTypes.shape),
@@ -107,33 +118,43 @@ class DishFabricScreen extends React.Component {
     };
   };
 
-
   constructor(props) {
     super(props);
 
     this.state = {
       dish: this.getDishFromNav(),
       refs: {
-        caloriesRef: React.createRef(),
-        carbohydratesRef: React.createRef(),
-        descriptionRef: React.createRef(),
-        fatsRef: React.createRef(),
-        giRef: React.createRef(),
         dishNameRef: React.createRef(),
-        proteinsRef: React.createRef(),
+        dishGIRef: React.createRef(),
+        dishDescriptionRef: React.createRef(),
       },
       mode: this.getModeFromNav(),
       modalVisible: false,
     };
 
+    this.updateIngredientRefs();
+
     this.addHeaderHandler();
   }
 
+  shouldComponentUpdate() {
+    this.updateIngredientRefs();
+    return true;
+  };
+
+  onIngredientsWeightBlur = index => (weight) => {
+    if (Number.isNaN(window.parseFloat(weight))) {
+      this.changeIngredientsWeight(index)('0');
+    }
+  };
 
   onItemSelect = (ingredient) => {
     const dish = JSON.parse(JSON.stringify(this.state.dish));
 
-    dish.ingredients.push(ingredient);
+    dish.ingredients[ingredient.id] = {
+      ...ingredient,
+      weight: '0',
+    };
 
     this.setState({
       dish,
@@ -142,12 +163,78 @@ class DishFabricScreen extends React.Component {
 
   onItemUnSelect = (ingredient) => {
     const dish = JSON.parse(JSON.stringify(this.state.dish));
-    dish.ingredients.splice(dish.ingredients.findIndex(item => ingredient.id === item.id), 1);
+    delete dish.ingredients[ingredient.id];
     this.setState({
       dish,
     });
   };
 
+  onGiChanged = (gi) => {
+    const { gi: oldGi } = this.state.dish;
+
+    if (oldGi !== gi) {
+      this.setState({
+        dish: {
+          ...this.state.dish,
+          gi,
+        },
+      });
+    }
+  };
+
+  onGiSubmitEditing = () => {
+    const { dishDescriptionRef } = this.state.refs;
+    if (dishDescriptionRef.current) {
+      dishDescriptionRef.current.focus();
+    }
+  };
+
+  onNameChanged = (name) => {
+    const { name: oldName } = this.state.dish;
+
+    if (oldName !== name) {
+      this.setState({
+        dish: {
+          ...this.state.dish,
+          name,
+        },
+      });
+    }
+  };
+
+  onNameSubmitEditing = () => {
+    const { dishGIRef } = this.state.refs;
+    if (dishGIRef.current) {
+      dishGIRef.current.focus();
+    }
+  };
+
+  onDescriptionChanged = (description) => {
+    const { description: oldDescription } = this.state.dish;
+
+    if (oldDescription !== description) {
+      this.setState({
+        dish: {
+          ...this.state.dish,
+          description,
+        },
+      });
+    }
+  };
+
+  onDescriptionSubmitEditing = () => {
+    const { ingredientsRefs } = this;
+
+    const ingredientsRefsKeys = Object.keys(ingredientsRefs);
+
+    if (ingredientsRefsKeys.length) {
+      const firstRef = ingredientsRefs[ingredientsRefsKeys[0]];
+
+      if (firstRef.current) {
+        firstRef.current.focus();
+      }
+    }
+  };
 
   addHeaderHandler = () => {
     const { navigation } = this.props;
@@ -157,10 +244,48 @@ class DishFabricScreen extends React.Component {
     navigation.setParams({ handleCancel: () => this.toViewMode() });
   };
 
+  changeIngredientsWeight = index => (weight) => {
+    const dish = JSON.parse(JSON.stringify(this.state.dish));
+    const ingredientsKeys = Object.keys(dish.ingredients);
+
+    dish.ingredients[ingredientsKeys[index]].weight = weight;
+
+    this.setState({
+      dish,
+    });
+  };
+
   closeSelector = () => {
     this.setState({
       modalVisible: false,
     });
+  };
+
+  dishCalculationsProps = () => {
+    let result = {
+      proteins: 0,
+      carbohydrates: 0,
+      fats: 0,
+    };
+    const { ingredients } = this.state.dish;
+    const ingredientsKeys = Object.keys(ingredients);
+
+    if (ingredientsKeys.length) {
+      result = ingredientsKeys.reduce((acum, ingredientsKey) => {
+        const { weight, type, id } = ingredients[ingredientsKey];
+        const ingredient = (type === 'product')
+          ? this.props.products.find(item => item.id === id)
+          : this.props.dishes.find(item => item.id === id);
+
+        return {
+          carbohydrates: acum.carbohydrates + ((ingredient.carbohydrates / 100) * weight),
+          fats: acum.fats + ((ingredient.fats / 100) * weight),
+          proteins: acum.proteins + ((ingredient.proteins / 100) * weight),
+        };
+      }, result);
+    }
+
+    return result;
   };
 
   getModeFromNav = () => {
@@ -174,7 +299,9 @@ class DishFabricScreen extends React.Component {
 
     return navigation.getParam('dish', {
       name: '',
-      ingredients: [],
+      gi: '',
+      ingredients: {},
+      description: '',
     });
   };
 
@@ -188,13 +315,27 @@ class DishFabricScreen extends React.Component {
     const { products, dishes } = this.props;
 
     return [
-      ...products.map(product => ({ id: product.id, title: product.name })),
-      ...dishes.map(dish => ({ id: dish.id, title: dish.name })),
+      ...products.map(product => ({ id: product.id, title: product.name, type: 'product' })),
+      ...dishes.map(dish => ({ id: dish.id, title: dish.name, type: 'dish' })),
     ].sort((a, b) => {
-      if (a.name > b.name) return -1;
-      if (a.name < b.name) return 1;
+      if (a.title > b.title) return -1;
+      if (a.title < b.title) return 1;
       return 0;
     });
+  };
+
+  getSelectedIngredientsIds =
+      ingredients => Object.keys(ingredients).map(ingredientKey => ingredients[ingredientKey].id);
+
+  goToNextIngredient = index => () => {
+    const { ingredientsRefs } = this;
+    const nextIngredientKey = Object.keys(ingredientsRefs)[index + 1];
+
+    console.log(30);
+
+    if (nextIngredientKey) {
+      ingredientsRefs[nextIngredientKey].current.focus();
+    }
   };
 
   renderModal = () => {
@@ -206,7 +347,7 @@ class DishFabricScreen extends React.Component {
         visible={modalVisible}>
         <ItemsSelector
           items={this.getSelectorItems()}
-          selectedIds={dish.ingredients.map(ingredient => ingredient.id)}
+          selectedIds={this.getSelectedIngredientsIds(dish.ingredients)}
           onClose={this.closeSelector}
           onItemSelect={this.onItemSelect}
           onItemUnSelect={this.onItemUnSelect}
@@ -214,6 +355,33 @@ class DishFabricScreen extends React.Component {
       </Modal>
     );
   };
+
+  renderIngredients = ingredients => (
+      <ScrollView>
+        {
+          Object.keys(ingredients).map((ingredientKey, index) => {
+            const ingredient = ingredients[ingredientKey];
+            const style = !index ? styles.dishFabricItemFirst : null;
+            const ingredientRef = this.ingredientsRefs[ingredientKey];
+
+            return (
+              <TextField
+                ref={ingredientRef}
+                key={ingredient.id}
+                style={style}
+                label={`${ingredient.title}(g):`}
+                keyboardType={'number-pad'}
+                required={true}
+                value={ingredient.weight}
+                onSubmitEditing={this.goToNextIngredient(index)}
+                onChangeText={this.changeIngredientsWeight(index)}
+                onBlur={this.onIngredientsWeightBlur(index)}/>
+            );
+          })
+        }
+
+      </ScrollView>
+  );
 
   renderEditMode = () => {
     const {
@@ -223,19 +391,40 @@ class DishFabricScreen extends React.Component {
 
     const {
       dishNameRef,
+      dishDescriptionRef,
+      dishGIRef,
     } = refs;
 
     return (
-      <ScrollView contentContainerStyle={styles.dishFabricScroll}>
+      <View contentContainerStyle={styles.dishFabricScroll}>
         <TextField
           style={styles.dishFabricLine}
-          label={'Dish name:'}
+          label={'Name:'}
           ref={dishNameRef}
           required={true}
           value={dish.name}
-          onSubmitEditing={this.onDishNameSubmitEditing}
-          onChangeText={this.onDishNameChanged}/>
+          onSubmitEditing={this.onNameSubmitEditing}
+          onChangeText={this.onNameChanged}/>
+        <TextField
+          style={styles.dishFabricLine}
+          label={'GI:'}
+          ref={dishGIRef}
+          required={true}
+          value={dish.gi}
+          onSubmitEditing={this.onGiSubmitEditing}
+          onChangeText={this.onGiChanged}/>
+        <TextField
+          style={styles.dishFabricLine}
+          label={'Description:'}
+          ref={dishDescriptionRef}
+          required={true}
+          value={dish.description}
+          onSubmitEditing={this.onDescriptionSubmitEditing}
+          onChangeText={this.onDescriptionChanged}/>
         <View>
+          <DishCalculations {...this.dishCalculationsProps()} />
+        </View>
+        <View style={styles.dishFabricAddButtonWrap}>
           <Button
             onPress={this.showProductSelector}
             title="Add ingredients"
@@ -244,9 +433,11 @@ class DishFabricScreen extends React.Component {
           />
         </View>
 
+        {this.renderIngredients(dish.ingredients)}
+
         {this.renderModal()}
 
-      </ScrollView>
+      </View>
     );
   };
 
@@ -316,6 +507,17 @@ class DishFabricScreen extends React.Component {
     });
   };
 
+  updateIngredientRefs = () => {
+    const { dish } = this.state;
+    if (dish) {
+      Object.keys(dish.ingredients).forEach((ingredientKey) => {
+        if (this.ingredientsRefs[ingredientKey] === undefined) {
+          this.ingredientsRefs[ingredientKey] = React.createRef();
+        }
+      });
+    }
+  };
+
   validateAll = () => {
     const { refs } = this.state;
     const { dish } = this.state;
@@ -341,7 +543,6 @@ class DishFabricScreen extends React.Component {
 
   render() {
     const { mode } = this.state;
-
     return (
       <SafeAreaView style={styles.dishFabric}>
         {

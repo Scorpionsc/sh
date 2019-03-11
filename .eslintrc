@@ -4,6 +4,11 @@
     "react",
     "react-native"
   ],
+  "globals": {
+    "window": true,
+    "document": true,
+    "isNaN": true
+  },
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true,

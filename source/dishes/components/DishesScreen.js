@@ -1,5 +1,5 @@
 import React from 'react';
-import SearchFilterScreen from './SearchFilterScreen';
+import SearchFilterScreen from '../../screens/components/SearchFilterScreen';
 import RoundButton from '../../roundButton/RoundButton';
 
 class DishesScreen extends SearchFilterScreen {
