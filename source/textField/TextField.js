@@ -84,7 +84,7 @@ class TextField extends React.Component {
       inputRef.current.focus();
     };
 
-    onChangeText = (text) => {1
+    onChangeText = (text) => {
       const { onChangeText } = this.props;
       onChangeText(text);
     };

@@ -14,6 +14,7 @@ import RoundButton from '../../roundButton/RoundButton';
 import TextField from '../../textField/TextField';
 import ItemsSelector from '../../itemsSelector/ItemsSelector';
 import DishCalculations from './DishCalculations';
+import DishFabricView from "./DishFabricView";
 
 const styles = StyleSheet.create({
   dishFabric: {
@@ -30,17 +31,6 @@ const styles = StyleSheet.create({
   dishFabricHeaderButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  dishFabricView: {
-    marginRight: 20,
-    marginLeft: 20,
-  },
-  dishFabricViewTitle: {
-    color: palette.color2,
-    fontSize: 30,
-    paddingTop: 20,
-    paddingBottom: 20,
-
   },
   dishFabricDescription: {
     borderColor: palette.color5,
@@ -140,7 +130,7 @@ class DishFabricScreen extends React.Component {
   shouldComponentUpdate() {
     this.updateIngredientRefs();
     return true;
-  };
+  }
 
   onIngredientsWeightBlur = index => (weight) => {
     if (Number.isNaN(window.parseFloat(weight))) {
@@ -338,6 +328,8 @@ class DishFabricScreen extends React.Component {
     }
   };
 
+  renderCalculations = () => (<DishCalculations {...this.dishCalculationsProps()} />);
+
   renderModal = () => {
     const { modalVisible, dish } = this.state;
     return (
@@ -417,13 +409,11 @@ class DishFabricScreen extends React.Component {
           style={styles.dishFabricLine}
           label={'Description:'}
           ref={dishDescriptionRef}
-          required={true}
+          required={false}
           value={dish.description}
           onSubmitEditing={this.onDescriptionSubmitEditing}
           onChangeText={this.onDescriptionChanged}/>
-        <View>
-          <DishCalculations {...this.dishCalculationsProps()} />
-        </View>
+        {this.renderCalculations()}
         <View style={styles.dishFabricAddButtonWrap}>
           <Button
             onPress={this.showProductSelector}
@@ -443,20 +433,10 @@ class DishFabricScreen extends React.Component {
 
   renderViewMode = () => {
     const { dish } = this.state;
-
     return (
-      <View style={styles.dishFabricView}>
-        <Text style={styles.dishFabricViewTitle}>{dish.name}</Text>
-        {
-          dish.description
-          && (
-            <View style={styles.dishFabricDescription}>
-              <Text style={styles.dishFabricDescriptionTitle}>Description:</Text>
-              <Text style={styles.dishFabricDescriptionValue}>{dish.description}</Text>
-            </View>
-          )
-        }
-      </View>
+      <DishFabricView dish={dish}>
+        {this.renderCalculations()}
+      </DishFabricView>
     );
   };
 

@@ -73,29 +73,29 @@ class DishCalculations extends React.Component {
       <View style={styles.dishCalculationsItem}>
         <Text style={styles.dishCalculationsTitle}>Proteins:</Text>
         <View style={styles.dishCalculationsLine}>
-          <Text style={styles.dishCalculationsValue}>{proteins}</Text>
-          <Text style={styles.dishCalculationsUnit}> (g)</Text>
+          <Text style={styles.dishCalculationsValue}>{Math.round(proteins)}</Text>
+          <Text style={styles.dishCalculationsUnit}>g</Text>
         </View>
       </View>
       <View style={[styles.dishCalculationsItem, styles.dishCalculationsItemLook]}>
         <Text style={styles.dishCalculationsTitle}>Fats:</Text>
         <View style={styles.dishCalculationsLine}>
-          <Text style={styles.dishCalculationsValue}>{fats}</Text>
-          <Text style={styles.dishCalculationsUnit}> (g)</Text>
+          <Text style={styles.dishCalculationsValue}>{Math.round(fats)}</Text>
+          <Text style={styles.dishCalculationsUnit}>g</Text>
         </View>
       </View>
       <View style={[styles.dishCalculationsItem, styles.dishCalculationsItemLook]}>
         <Text style={styles.dishCalculationsTitle}>Carbs:</Text>
         <View style={styles.dishCalculationsLine}>
-          <Text style={styles.dishCalculationsValue}>{carbohydrates}</Text>
-          <Text style={styles.dishCalculationsUnit}> (g)</Text>
+          <Text style={styles.dishCalculationsValue}>{Math.round(carbohydrates)}</Text>
+          <Text style={styles.dishCalculationsUnit}>g</Text>
         </View>
       </View>
       <View style={[styles.dishCalculationsItem, styles.dishCalculationsItemLook]}>
         <Text style={styles.dishCalculationsTitle}>Calories:</Text>
         <View style={styles.dishCalculationsLine}>
-          <Text style={styles.dishCalculationsValue}>{calories}</Text>
-          <Text style={styles.dishCalculationsUnit}> (kKal)</Text>
+          <Text style={styles.dishCalculationsValue}>{Math.round(calories)}</Text>
+          <Text style={styles.dishCalculationsUnit}>kKal</Text>
         </View>
       </View>
     </View>);
