@@ -49,6 +49,21 @@ const styles = StyleSheet.create({
     color: palette.color2,
     fontSize: 16,
   },
+  dishFabricDescription: {
+    borderColor: palette.color5,
+    borderTopWidth: 1,
+    paddingTop: 20,
+    marginBottom: 20,
+  },
+  dishFabricDescriptionTitle: {
+    fontSize: 18,
+    color: palette.color2,
+    marginBottom: 10,
+  },
+  dishFabricDescriptionValue: {
+    color: palette.color2,
+    fontSize: 16,
+  },
 });
 
 class DishFabricView extends React.Component {
@@ -111,8 +126,8 @@ class DishFabricView extends React.Component {
       <View style={styles.dishFabricView}>
         <Text style={styles.dishFabricViewTitle}>{dish.name}</Text>
         {this.renderLine(giLineData)}
-        { children }
         { this.renderDescription(dish.description) }
+        { children }
         { this.renderIngredients(dish.ingredients) }
       </View>
     );

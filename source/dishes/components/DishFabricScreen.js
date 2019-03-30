@@ -5,7 +5,6 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
-  Text,
   View,
 } from 'react-native';
 import PropTypes from 'prop-types';
@@ -14,7 +13,7 @@ import RoundButton from '../../roundButton/RoundButton';
 import TextField from '../../textField/TextField';
 import ItemsSelector from '../../itemsSelector/ItemsSelector';
 import DishCalculations from './DishCalculations';
-import DishFabricView from "./DishFabricView";
+import DishFabricView from './DishFabricView';
 
 const styles = StyleSheet.create({
   dishFabric: {
@@ -31,20 +30,6 @@ const styles = StyleSheet.create({
   dishFabricHeaderButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  dishFabricDescription: {
-    borderColor: palette.color5,
-    borderTopWidth: 1,
-    paddingTop: 20,
-  },
-  dishFabricDescriptionTitle: {
-    fontSize: 18,
-    color: palette.color2,
-    marginBottom: 10,
-  },
-  dishFabricDescriptionValue: {
-    color: palette.color2,
-    fontSize: 16,
   },
   dishFabricItemFirst: {
     borderTopWidth: 1,
@@ -120,6 +105,7 @@ class DishFabricScreen extends React.Component {
       },
       mode: this.getModeFromNav(),
       modalVisible: false,
+      giEdited: false,
     };
 
     this.updateIngredientRefs();
@@ -131,6 +117,7 @@ class DishFabricScreen extends React.Component {
     this.updateIngredientRefs();
     return true;
   }
+
 
   onIngredientsWeightBlur = index => (weight) => {
     if (Number.isNaN(window.parseFloat(weight))) {
@@ -168,6 +155,7 @@ class DishFabricScreen extends React.Component {
           ...this.state.dish,
           gi,
         },
+        giEdited: true,
       });
     }
   };
@@ -226,6 +214,7 @@ class DishFabricScreen extends React.Component {
     }
   };
 
+
   addHeaderHandler = () => {
     const { navigation } = this.props;
 
@@ -233,6 +222,64 @@ class DishFabricScreen extends React.Component {
     navigation.setParams({ handleEdit: () => this.toEditMode() });
     navigation.setParams({ handleCancel: () => this.toViewMode() });
   };
+
+  calculateGI = (ingredients) => {
+    const ingredientsArr = this.ingredientsArr(ingredients);
+    const ingredientCarbs = ingredientsArr.reduce((calculations, ingredient) => {
+      const { gi, ingredients: subIngredients, weight } = ingredient;
+      let { carbohydrates } = ingredient;
+
+      if (carbohydrates === undefined) carbohydrates = this.calculateCarbs(subIngredients);
+
+      const calculatedCarbs = (weight / 100) * carbohydrates;
+
+      return {
+        carbohydrates: calculatedCarbs + calculations.carbohydrates,
+        carbohydratesWithGI: (calculatedCarbs * (gi / 100)) + calculations.carbohydratesWithGI,
+      };
+    }, {
+      carbohydratesWithGI: 0,
+      carbohydrates: 0,
+    });
+
+    const gi = (ingredientCarbs.carbohydratesWithGI / ingredientCarbs.carbohydrates) * 100;
+
+    return Number.isNaN(gi) ? '' : `${Math.round(gi)}`;
+  };
+
+  calculateCarbs = (ingredients) => {
+    return ingredients.reduce((calcs, ingredient) => {
+      let { carbohydrates } = ingredient;
+      const { weight, ingredients: subIngredients } = ingredient;
+
+      if (carbohydrates === undefined) carbohydrates = this.calculateCarbs(subIngredients);
+
+      return calcs + ((weight / 100) * carbohydrates);
+    }, 0);
+  };
+
+  ingredientsArr = (ingredients) => {
+    const ingredientsKeys = Object.keys(ingredients);
+    const { dishes, products } = this.props;
+
+    return ingredientsKeys.map((key) => {
+      const { type, weight } = ingredients[key];
+      const ingredient = type === 'product'
+        ? products.find(product => product.id === key)
+        : dishes.find(dish => dish.id === key);
+
+      const { carbohydrates, gi, ingredients: subIngredients } = ingredient;
+
+      return (carbohydrates === undefined)
+        ? {
+          ingredients: this.ingredientsArr(subIngredients),
+          gi,
+          weight,
+        }
+        : { carbohydrates, gi, weight };
+    });
+  };
+
 
   changeIngredientsWeight = index => (weight) => {
     const dish = JSON.parse(JSON.stringify(this.state.dish));
@@ -251,31 +298,17 @@ class DishFabricScreen extends React.Component {
     });
   };
 
-  dishCalculationsProps = () => {
-    let result = {
+  getIngredientsData = (ingredients) => {
+    const ingredientsKeys = Object.keys(ingredients);
+    const result = {
       proteins: 0,
       carbohydrates: 0,
       fats: 0,
     };
-    const { ingredients } = this.state.dish;
-    const ingredientsKeys = Object.keys(ingredients);
 
-    if (ingredientsKeys.length) {
-      result = ingredientsKeys.reduce((acum, ingredientsKey) => {
-        const { weight, type, id } = ingredients[ingredientsKey];
-        const ingredient = (type === 'product')
-          ? this.props.products.find(item => item.id === id)
-          : this.props.dishes.find(item => item.id === id);
-
-        return {
-          carbohydrates: acum.carbohydrates + ((ingredient.carbohydrates / 100) * weight),
-          fats: acum.fats + ((ingredient.fats / 100) * weight),
-          proteins: acum.proteins + ((ingredient.proteins / 100) * weight),
-        };
-      }, result);
-    }
-
-    return result;
+    return (ingredientsKeys.length)
+      ? ingredientsKeys.reduce(this.ingredientsReducer(ingredients), result)
+      : result;
   };
 
   getModeFromNav = () => {
@@ -293,6 +326,25 @@ class DishFabricScreen extends React.Component {
       ingredients: {},
       description: '',
     });
+  };
+
+  getDishGI = () => {
+    const { dish, giEdited } = this.state;
+    const { gi, ingredients } = dish;
+
+    if (giEdited) return gi;
+
+    if (gi === '') {
+      const ingredientsKeys = Object.keys(ingredients);
+
+      if (ingredientsKeys.length) {
+        return this.calculateGI(ingredients);
+      }
+
+      return gi;
+    }
+
+    return gi;
   };
 
   getDishIdFromNav = () => {
@@ -315,20 +367,35 @@ class DishFabricScreen extends React.Component {
   };
 
   getSelectedIngredientsIds =
-      ingredients => Object.keys(ingredients).map(ingredientKey => ingredients[ingredientKey].id);
+    ingredients => Object.keys(ingredients).map(ingredientKey => ingredients[ingredientKey].id);
 
   goToNextIngredient = index => () => {
     const { ingredientsRefs } = this;
     const nextIngredientKey = Object.keys(ingredientsRefs)[index + 1];
-
-    console.log(30);
-
     if (nextIngredientKey) {
       ingredientsRefs[nextIngredientKey].current.focus();
     }
   };
 
-  renderCalculations = () => (<DishCalculations {...this.dishCalculationsProps()} />);
+  ingredientsReducer = ingredients => (calculations, ingredientsKey) => {
+    const { weight, type, id } = ingredients[ingredientsKey];
+
+    const ingredient = (type === 'product')
+      ? this.props.products.find(item => item.id === id)
+      : this.getIngredientsData(this.props.dishes.find(item => item.id === id).ingredients);
+
+    return {
+      carbohydrates: calculations.carbohydrates + ((ingredient.carbohydrates / 100) * weight),
+      fats: calculations.fats + ((ingredient.fats / 100) * weight),
+      proteins: calculations.proteins + ((ingredient.proteins / 100) * weight),
+    };
+  };
+
+  renderCalculations = () => {
+    const { ingredients } = this.state.dish;
+
+    return (<DishCalculations {...this.getIngredientsData(ingredients)} />);
+  };
 
   renderModal = () => {
     const { modalVisible, dish } = this.state;
@@ -349,30 +416,30 @@ class DishFabricScreen extends React.Component {
   };
 
   renderIngredients = ingredients => (
-      <ScrollView>
-        {
-          Object.keys(ingredients).map((ingredientKey, index) => {
-            const ingredient = ingredients[ingredientKey];
-            const style = !index ? styles.dishFabricItemFirst : null;
-            const ingredientRef = this.ingredientsRefs[ingredientKey];
+    <ScrollView>
+      {
+        Object.keys(ingredients).map((ingredientKey, index) => {
+          const ingredient = ingredients[ingredientKey];
+          const style = !index ? styles.dishFabricItemFirst : null;
+          const ingredientRef = this.ingredientsRefs[ingredientKey];
 
-            return (
-              <TextField
-                ref={ingredientRef}
-                key={ingredient.id}
-                style={style}
-                label={`${ingredient.title}(g):`}
-                keyboardType={'number-pad'}
-                required={true}
-                value={ingredient.weight}
-                onSubmitEditing={this.goToNextIngredient(index)}
-                onChangeText={this.changeIngredientsWeight(index)}
-                onBlur={this.onIngredientsWeightBlur(index)}/>
-            );
-          })
-        }
+          return (
+            <TextField
+              ref={ingredientRef}
+              key={ingredient.id}
+              style={style}
+              label={`${ingredient.title}(g):`}
+              keyboardType={'number-pad'}
+              required={true}
+              value={ingredient.weight}
+              onSubmitEditing={this.goToNextIngredient(index)}
+              onChangeText={this.changeIngredientsWeight(index)}
+              onBlur={this.onIngredientsWeightBlur(index)}/>
+          );
+        })
+      }
 
-      </ScrollView>
+    </ScrollView>
   );
 
   renderEditMode = () => {
@@ -401,8 +468,7 @@ class DishFabricScreen extends React.Component {
           style={styles.dishFabricLine}
           label={'GI:'}
           ref={dishGIRef}
-          required={true}
-          value={dish.gi}
+          value={this.getDishGI()}
           onSubmitEditing={this.onGiSubmitEditing}
           onChangeText={this.onGiChanged}/>
         <TextField
@@ -449,6 +515,11 @@ class DishFabricScreen extends React.Component {
       const newDish = {};
 
       newDish[itemId] = dish;
+
+      if (newDish[itemId].gi === '') {
+        newDish[itemId].gi = this.getDishGI();
+      }
+
       newDish[itemId].updatedAt = Date.now();
 
       addDish(newDish);
@@ -511,7 +582,7 @@ class DishFabricScreen extends React.Component {
 
     for (let i = 0; i < dishKeys.length; i += 1) {
       const key = dishKeys[i];
-      if (key !== 'description') {
+      if (key !== 'description' && key !== 'gi') {
         valid = !(dish[key] === '');
         if (!valid) break;
       }

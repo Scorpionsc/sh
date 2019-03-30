@@ -1,8 +1,6 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
-  View,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import palette from '../../palette/index';
@@ -55,10 +53,6 @@ class DishFabricItem extends React.Component {
     const { title, weight, index } = this.props;
     const { fieldRef } = this.state;
     const style = !index ? styles.productFabricItemFirst : null;
-
-
-    console.log(style);
-    console.log(title, weight, index);
 
     return (
       <TextField

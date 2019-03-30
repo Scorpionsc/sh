@@ -13,7 +13,6 @@ class DishesScreen extends SearchFilterScreen {
     };
   };
 
-
   componentDidMount() {
     const { navigation } = this.props;
     navigation.setParams({ handleHeaderButton: () => this.addDish() });
