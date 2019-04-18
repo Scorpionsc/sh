@@ -37,7 +37,10 @@ class TextField extends React.Component {
       multiline: PropTypes.bool,
       numberOfLines: PropTypes.number,
       required: PropTypes.bool,
-      style: PropTypes.object,
+      style: PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.array,
+      ]),
       value: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.string,

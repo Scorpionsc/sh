@@ -1,23 +1,26 @@
 import React from 'react';
 import {
-  SafeAreaView, StyleSheet,
+  SafeAreaView, StyleSheet, ScrollView,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import palette from '../../../palette/index';
 import ItemsSelector from '../../../share/itemsSelector/ItemsSelector';
 import CalculatorNutritionalValue from './CalculatorNutritionalValue';
+import SearchControl from '../../../share/searchControl/SearchControl';
+import IngredientsEditor from '../../../share/ingredientsEditor/IngredientsEditor';
 
 const styles = StyleSheet.create({
-  temp: {
-    color: palette.color2,
-  },
   calculator: {
     flex: 1,
+    alignSelf: 'stretch',
     backgroundColor: palette.color3,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
   },
   calculatorSelectorList: {
+    alignSelf: 'stretch',
+  },
+  calculatorScroll: {
+    padding: 20,
+    flex: 1,
     alignSelf: 'stretch',
   },
 });
@@ -33,8 +36,25 @@ class CalculatorScreen extends React.Component {
 
   state = {
     selectedItems: [],
+    searchText: '',
   };
 
+  getSelectedIngredients = () => {
+    const { selectedItems } = this.state;
+    console.log(selectedItems);
+
+    return [];
+  };
+
+  tt = ingredients => (Object.keys(ingredients).map((ingredientKey, index) => {
+    const ingredient = ingredients[ingredientKey];
+    const style = [styles.dishFabricItem];
+    const ingredientRef = this.ingredientsRefs[ingredientKey];
+
+    if (!index) style.push(styles.dishFabricItemFirst);
+
+    return null;
+  }));
 
   itemsSelectorProps = () => {
     const {
@@ -42,17 +62,16 @@ class CalculatorScreen extends React.Component {
       props,
       state,
       onItemSelect,
-      onItemUnSelect,
     } = this;
+
     const { dishes, products } = props;
-    const { selectedItems } = state;
+    const { selectedItems, searchText } = state;
 
     return {
       items: itemsToArray(dishes, 'dish').concat(itemsToArray(products, 'product')),
-      noHeader: true,
       selectedIds: selectedItems.map(item => item.id),
+      searchText,
       onItemSelect,
-      onItemUnSelect,
     };
   };
 
@@ -82,20 +101,75 @@ class CalculatorScreen extends React.Component {
     });
   };
 
+  onSearchTextChange = (searchText) => {
+    this.setState({
+      searchText,
+    });
+  };
+
+  getSelectedItems = (items) => {
+    const { selectedItems } = this.state;
+
+    return selectedItems.reduce((result, selectedItem) => {
+      if (items[selectedItem.id]) {
+        return [
+          ...result,
+          ...[
+            {
+              ...items[selectedItem.id],
+              id: selectedItem.id,
+            },
+          ],
+        ];
+      }
+      return result;
+    }, []);
+  };
+
+  getIngredientsEditorProps = () => {
+    const { getSelectedItems, props } = this;
+    const { dishes: dishesSource, products: productsSource } = props;
+    const dishes = getSelectedItems(dishesSource);
+    const products = getSelectedItems(productsSource);
+
+    return {
+      items: dishes.concat(products),
+    };
+  };
+
+  renderIngredientsEditor = () => <IngredientsEditor {...this.getIngredientsEditorProps()}/>;
+
   renderItemsSelector = () => {
     const { itemsSelectorProps } = this;
-    return (<ItemsSelector style={[styles.calculatorSelectorList]} {...itemsSelectorProps()}/>);
+    return (
+      <ItemsSelector {...itemsSelectorProps()}/>
+    );
   };
 
   renderNutritionalValue = () => <CalculatorNutritionalValue />;
 
+  renderSearchControl = () => {
+    const { searchText } = this.state;
+    return <SearchControl searchText={searchText} onChangeText={this.onSearchTextChange}/>;
+  };
+
 
   render() {
-    const { renderItemsSelector, renderNutritionalValue } = this;
+    const {
+      renderIngredientsEditor,
+      renderItemsSelector,
+      renderNutritionalValue,
+      renderSearchControl,
+    } = this;
+
     return (
       <SafeAreaView style={[styles.calculator]}>
-        {renderNutritionalValue()}
-        {renderItemsSelector()}
+        <ScrollView contentContainerStyle={styles.calculatorScroll}>
+          {renderNutritionalValue()}
+          {renderIngredientsEditor()}
+          {renderItemsSelector()}
+        </ScrollView>
+        {renderSearchControl()}
       </SafeAreaView>
     );
   }

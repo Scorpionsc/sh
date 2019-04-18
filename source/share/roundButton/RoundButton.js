@@ -17,10 +17,13 @@ const styles = StyleSheet.create({
     backgroundColor: palette.color5,
     width: 40,
     height: 40,
+    marginRight: 10,
+    marginLeft: 10,
     borderRadius: 20,
   },
   roundButtonIOS: {
     marginRight: 10,
+    marginLeft: 10,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: palette.color5,

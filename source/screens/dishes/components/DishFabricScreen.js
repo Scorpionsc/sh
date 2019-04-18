@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  Button,
-  Modal,
   StyleSheet,
   SafeAreaView,
   ScrollView,
@@ -14,6 +12,7 @@ import TextField from '../../../share/textField/TextField';
 import ItemsSelector from '../../../share/itemsSelector/ItemsSelector';
 import NutritionalValueCalculations from '../../../share/nutritionalValueCalculations/NutritionalValueCalculations';
 import DishFabricView from './DishFabricView';
+import SearchControl from '../../../share/searchControl/SearchControl';
 
 const styles = StyleSheet.create({
   dishFabric: {
@@ -22,6 +21,8 @@ const styles = StyleSheet.create({
   },
   dishFabricScroll: {
     padding: 20,
+    flex: 1,
+    alignSelf: 'stretch',
   },
   dishFabricLine: {
     borderTopWidth: 1,
@@ -31,13 +32,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  dishFabricItem: {
+    flex: 1,
+  },
   dishFabricItemFirst: {
     borderTopWidth: 1,
     alignSelf: 'stretch',
   },
-  dishFabricAddButtonWrap: {
-    paddingTop: 20,
-    paddingBottom: 20,
+  dishFabricEdit: {
+    flex: 1,
+    alignSelf: 'stretch',
+    backgroundColor: palette.color3,
+  },
+  ingredient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  trashButton: {
+    marginLeft: 10,
+    marginRight: 10,
   },
 });
 
@@ -104,8 +118,8 @@ class DishFabricScreen extends React.Component {
         dishDescriptionRef: React.createRef(),
       },
       mode: this.getModeFromNav(),
-      modalVisible: false,
       giEdited: false,
+      searchText: '',
     };
 
     this.updateIngredientRefs();
@@ -138,7 +152,7 @@ class DishFabricScreen extends React.Component {
     });
   };
 
-  onItemUnSelect = (ingredient) => {
+  onItemUnSelect = ingredient => () => {
     const dish = JSON.parse(JSON.stringify(this.state.dish));
     delete dish.ingredients[ingredient.id];
     this.setState({
@@ -316,8 +330,10 @@ class DishFabricScreen extends React.Component {
     }, 0);
 
     return totalWeight > 0 ? Object.keys(result).reduce((resultData, key) => {
-      resultData[key] = result[key] / (totalWeight / 100);
-      return resultData;
+      const newDataItem = {
+        [key]: result[key] / (totalWeight / 100),
+      };
+      return { ...resultData, ...newDataItem };
     }, {}) : result;
   };
 
@@ -407,102 +423,102 @@ class DishFabricScreen extends React.Component {
     return (<NutritionalValueCalculations {...this.getIngredientsData(ingredients)} />);
   };
 
-  renderModal = () => {
-    const { modalVisible, dish } = this.state;
+  renderIngredientsSelector = () => {
+    const { dish, searchText } = this.state;
     return (
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}>
-        <ItemsSelector
-          items={this.getSelectorItems()}
-          selectedIds={this.getSelectedIngredientsIds(dish.ingredients)}
-          onClose={this.closeSelector}
-          onItemSelect={this.onItemSelect}
-          onItemUnSelect={this.onItemUnSelect}
-        />
-      </Modal>
+
+      <ItemsSelector
+        items={this.getSelectorItems()}
+        selectedIds={this.getSelectedIngredientsIds(dish.ingredients)}
+        searchText={searchText}
+        onClose={this.closeSelector}
+        onItemSelect={this.onItemSelect}
+        onItemUnSelect={this.onItemUnSelect}
+      />
     );
   };
 
-  renderIngredients = ingredients => (
-    <ScrollView>
-      {
-        Object.keys(ingredients).map((ingredientKey, index) => {
-          const ingredient = ingredients[ingredientKey];
-          const style = !index ? styles.dishFabricItemFirst : null;
-          const ingredientRef = this.ingredientsRefs[ingredientKey];
+  renderIngredients = ingredients => (Object.keys(ingredients).map((ingredientKey, index) => {
+    const ingredient = ingredients[ingredientKey];
+    const style = [styles.dishFabricItem];
+    const ingredientRef = this.ingredientsRefs[ingredientKey];
 
-          return (
-            <TextField
-              ref={ingredientRef}
-              key={ingredient.id}
-              style={style}
-              label={`${ingredient.title}(g):`}
-              keyboardType={'number-pad'}
-              required={true}
-              value={ingredient.weight}
-              onSubmitEditing={this.goToNextIngredient(index)}
-              onChangeText={this.changeIngredientsWeight(index)}
-              onBlur={this.onIngredientsWeightBlur(index)}/>
-          );
-        })
-      }
+    if (!index) style.push(styles.dishFabricItemFirst);
 
-    </ScrollView>
-  );
+    return (
+      <View key={ingredient.id} style={styles.ingredient}>
+        <TextField
+          ref={ingredientRef}
+          style={style}
+          label={`${ingredient.title}(g):`}
+          keyboardType={'number-pad'}
+          required={true}
+          value={ingredient.weight}
+          onSubmitEditing={this.goToNextIngredient(index)}
+          onChangeText={this.changeIngredientsWeight(index)}
+          onBlur={this.onIngredientsWeightBlur(index)}/>
+        <RoundButton
+          style={styles.trashButton}
+          androidName={'md-trash'}
+          iosName={'ios-trash'}
+          size={30}
+          onPress={this.onItemUnSelect(ingredient)}/>
+      </View>
+    );
+  }));
 
-  renderEditMode = () => {
-    const {
-      refs,
-      dish,
-    } = this.state;
-
+  renderEditTexts() {
+    const { refs, dish } = this.state;
     const {
       dishNameRef,
       dishDescriptionRef,
       dishGIRef,
     } = refs;
 
+    return (<>
+      <TextField
+        style={styles.dishFabricLine}
+        label={'Name:'}
+        ref={dishNameRef}
+        required={true}
+        value={dish.name}
+        onSubmitEditing={this.onNameSubmitEditing}
+        onChangeText={this.onNameChanged}/>
+      <TextField
+        style={styles.dishFabricLine}
+        label={'GI:'}
+        ref={dishGIRef}
+        value={this.getDishGI()}
+        onSubmitEditing={this.onGiSubmitEditing}
+        onChangeText={this.onGiChanged}/>
+      <TextField
+        style={styles.dishFabricLine}
+        label={'Description:'}
+        ref={dishDescriptionRef}
+        required={false}
+        value={dish.description}
+        onSubmitEditing={this.onDescriptionSubmitEditing}
+        onChangeText={this.onDescriptionChanged}/>
+    </>);
+  }
+
+  renderEditMode = () => {
+    const { dish } = this.state;
+
     return (
-      <View contentContainerStyle={styles.dishFabricScroll}>
-        <TextField
-          style={styles.dishFabricLine}
-          label={'Name:'}
-          ref={dishNameRef}
-          required={true}
-          value={dish.name}
-          onSubmitEditing={this.onNameSubmitEditing}
-          onChangeText={this.onNameChanged}/>
-        <TextField
-          style={styles.dishFabricLine}
-          label={'GI:'}
-          ref={dishGIRef}
-          value={this.getDishGI()}
-          onSubmitEditing={this.onGiSubmitEditing}
-          onChangeText={this.onGiChanged}/>
-        <TextField
-          style={styles.dishFabricLine}
-          label={'Description:'}
-          ref={dishDescriptionRef}
-          required={false}
-          value={dish.description}
-          onSubmitEditing={this.onDescriptionSubmitEditing}
-          onChangeText={this.onDescriptionChanged}/>
-        {this.renderCalculations()}
-        <View style={styles.dishFabricAddButtonWrap}>
-          <Button
-            onPress={this.showProductSelector}
-            title="Add ingredients"
-            color={palette.color4}
-            accessibilityLabel="Add ingredients"
-          />
-        </View>
+      <View style={styles.dishFabricEdit}>
+        <ScrollView contentContainerStyle={styles.dishFabricScroll}>
 
-        {this.renderIngredients(dish.ingredients)}
+          {this.renderEditTexts()}
 
-        {this.renderModal()}
+          {this.renderCalculations()}
 
+          {this.renderIngredients(dish.ingredients)}
+
+          {this.renderIngredientsSelector()}
+
+        </ScrollView>
+        { this.renderSearchControl() }
       </View>
     );
   };
@@ -514,6 +530,17 @@ class DishFabricScreen extends React.Component {
         {this.renderCalculations()}
       </DishFabricView>
     );
+  };
+
+  renderSearchControl = () => {
+    const { searchText } = this.state;
+    return <SearchControl searchText={searchText} onChangeText={this.onSearchTextChange}/>;
+  };
+
+  onSearchTextChange = (searchText) => {
+    this.setState({
+      searchText,
+    });
   };
 
   saveSettings = () => {
@@ -536,12 +563,6 @@ class DishFabricScreen extends React.Component {
 
       this.toViewMode(itemId);
     }
-  };
-
-  showProductSelector = () => {
-    this.setState({
-      modalVisible: true,
-    });
   };
 
   toEditMode = () => {
@@ -600,7 +621,6 @@ class DishFabricScreen extends React.Component {
 
     return valid;
   };
-
 
   render() {
     const { mode } = this.state;

@@ -40,8 +40,7 @@ class SearchControl extends React.Component {
   static defaultProps = {
     searchText: '',
 
-    onChangeText: () => {
-    },
+    onChangeText: () => {},
   };
 
   state = {
