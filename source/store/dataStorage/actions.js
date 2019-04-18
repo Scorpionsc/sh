@@ -1,13 +1,13 @@
-import {fetchUser} from "../user/actions";
-import {fetchProducts} from "../products/actions";
-import {fetchDishes} from "../dishes/actions";
+import { fetchUser } from '../user/actions';
+import { fetchProducts } from '../../screens/products/store/actions';
+import { fetchDishes } from '../../screens/dishes/store/actions';
+import { fetchSpeed } from '../../screens/settings/store/actions';
 
-export const fetchData = () => {
-    return (dispatch) => {
-        fetchUser(dispatch)
-            .then(() => {
-                fetchProducts(dispatch);
-                fetchDishes(dispatch);
-            });
-    }
+export const fetchData = () => (dispatch) => {
+  fetchUser(dispatch)
+    .then(() => {
+      fetchSpeed(dispatch);
+      fetchProducts(dispatch);
+      fetchDishes(dispatch);
+    });
 };
