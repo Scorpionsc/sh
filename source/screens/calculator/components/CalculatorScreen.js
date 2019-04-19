@@ -39,23 +39,6 @@ class CalculatorScreen extends React.Component {
     searchText: '',
   };
 
-  getSelectedIngredients = () => {
-    const { selectedItems } = this.state;
-    console.log(selectedItems);
-
-    return [];
-  };
-
-  tt = ingredients => (Object.keys(ingredients).map((ingredientKey, index) => {
-    const ingredient = ingredients[ingredientKey];
-    const style = [styles.dishFabricItem];
-    const ingredientRef = this.ingredientsRefs[ingredientKey];
-
-    if (!index) style.push(styles.dishFabricItemFirst);
-
-    return null;
-  }));
-
   itemsSelectorProps = () => {
     const {
       itemsToArray,
@@ -85,25 +68,34 @@ class CalculatorScreen extends React.Component {
     const { selectedItems } = this.state;
 
     this.setState({
-      selectedItems: selectedItems.concat([itemToAdd]).slice(),
+      selectedItems: selectedItems.concat([{ ...itemToAdd, ...{ weight: '0' } }]).slice(),
     });
   };
 
-  onItemUnSelect = (itemToAdd) => {
-    const { selectedItems: stateSelectedItems } = this.state;
-    const selectedItems = stateSelectedItems.slice();
-    const itemIndex = selectedItems.findIndex(item => item.id === itemToAdd.id);
-
-    selectedItems.splice(itemIndex, 1);
+  onItemUnSelect = (ingredientKey) => {
+    const { selectedItems } = this.state;
 
     this.setState({
-      selectedItems,
+      selectedItems: selectedItems.filter(item => item.id !== ingredientKey),
     });
   };
 
   onSearchTextChange = (searchText) => {
     this.setState({
       searchText,
+    });
+  };
+
+  onWeightChange = (data) => {
+    const { selectedItems } = this.state;
+
+    this.setState({
+      selectedItems: selectedItems.map((item) => {
+        if (item.id === data.key) {
+          return Object.assign(item, { weight: data.value });
+        }
+        return item;
+      }),
     });
   };
 
@@ -127,17 +119,24 @@ class CalculatorScreen extends React.Component {
   };
 
   getIngredientsEditorProps = () => {
-    const { getSelectedItems, props } = this;
-    const { dishes: dishesSource, products: productsSource } = props;
-    const dishes = getSelectedItems(dishesSource);
-    const products = getSelectedItems(productsSource);
+    // const { getSelectedItems, props } = this;
+    // const { dishes: dishesSource, products: productsSource } = props;
+    // const dishes = getSelectedItems(dishesSource);
+    // const products = getSelectedItems(productsSource);
+    //
+    // return {
+    //   items: dishes.concat(products),
+    // };
+    const { selectedItems } = this.state;
 
     return {
-      items: dishes.concat(products),
+      items: selectedItems,
+      onWeightChange: this.onWeightChange,
+      onItemUnSelect: this.onItemUnSelect,
     };
   };
 
-  renderIngredientsEditor = () => <IngredientsEditor {...this.getIngredientsEditorProps()}/>;
+  renderIngredientsEditor = () => (<IngredientsEditor {...this.getIngredientsEditorProps() } />);
 
   renderItemsSelector = () => {
     const { itemsSelectorProps } = this;
