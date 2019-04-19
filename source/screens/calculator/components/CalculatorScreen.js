@@ -39,6 +39,48 @@ class CalculatorScreen extends React.Component {
     searchText: '',
   };
 
+  getCalculatorNutritionalValue = () => {
+    const { getSelectedItems, props, state } = this;
+    const { selectedItems } = state;
+    const { dishes: dishesSource, products: productsSource } = props;
+    const dishes = getSelectedItems(dishesSource);
+    const products = getSelectedItems(productsSource);
+
+    return {
+      ingredients: dishes.concat(products),
+      selectedIngredients: selectedItems,
+    };
+  };
+
+  getIngredientsEditorProps = () => {
+    const { selectedItems } = this.state;
+
+    return {
+      items: selectedItems,
+      onWeightChange: this.onWeightChange,
+      onItemUnSelect: this.onItemUnSelect,
+    };
+  };
+
+  getSelectedItems = (items) => {
+    const { selectedItems } = this.state;
+
+    return selectedItems.reduce((result, selectedItem) => {
+      if (items[selectedItem.id]) {
+        return [
+          ...result,
+          ...[
+            {
+              ...items[selectedItem.id],
+              id: selectedItem.id,
+            },
+          ],
+        ];
+      }
+      return result;
+    }, []);
+  };
+
   itemsSelectorProps = () => {
     const {
       itemsToArray,
@@ -99,43 +141,6 @@ class CalculatorScreen extends React.Component {
     });
   };
 
-  getSelectedItems = (items) => {
-    const { selectedItems } = this.state;
-
-    return selectedItems.reduce((result, selectedItem) => {
-      if (items[selectedItem.id]) {
-        return [
-          ...result,
-          ...[
-            {
-              ...items[selectedItem.id],
-              id: selectedItem.id,
-            },
-          ],
-        ];
-      }
-      return result;
-    }, []);
-  };
-
-  getIngredientsEditorProps = () => {
-    // const { getSelectedItems, props } = this;
-    // const { dishes: dishesSource, products: productsSource } = props;
-    // const dishes = getSelectedItems(dishesSource);
-    // const products = getSelectedItems(productsSource);
-    //
-    // return {
-    //   items: dishes.concat(products),
-    // };
-    const { selectedItems } = this.state;
-
-    return {
-      items: selectedItems,
-      onWeightChange: this.onWeightChange,
-      onItemUnSelect: this.onItemUnSelect,
-    };
-  };
-
   renderIngredientsEditor = () => (<IngredientsEditor {...this.getIngredientsEditorProps() } />);
 
   renderItemsSelector = () => {
@@ -145,7 +150,7 @@ class CalculatorScreen extends React.Component {
     );
   };
 
-  renderNutritionalValue = () => <CalculatorNutritionalValue />;
+  renderNutritionalValue = () => <CalculatorNutritionalValue {...this.getCalculatorNutritionalValue()}/>;
 
   renderSearchControl = () => {
     const { searchText } = this.state;

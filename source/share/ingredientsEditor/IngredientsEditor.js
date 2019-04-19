@@ -55,7 +55,6 @@ class IngredientsEditor extends Component {
     });
   };
 
-
   onIngredientsWeightBlur = index => (weight) => {
     if (Number.isNaN(window.parseFloat(weight))) {
       this.changeIngredientsWeight(index)('0');
@@ -101,6 +100,7 @@ class IngredientsEditor extends Component {
       );
     });
   };
+
 
   render() {
     return (
