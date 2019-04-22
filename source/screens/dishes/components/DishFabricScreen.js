@@ -311,6 +311,8 @@ class DishFabricScreen extends React.Component {
   };
 
   getIngredientsData = (ingredients) => {
+    console.log(ingredients);
+
     const ingredientsKeys = Object.keys(ingredients);
     let result = {
       proteins: 0,

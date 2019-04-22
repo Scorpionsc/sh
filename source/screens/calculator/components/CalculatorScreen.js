@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  SafeAreaView, StyleSheet, ScrollView,
+  SafeAreaView, StyleSheet, ScrollView, View,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import palette from '../../../palette/index';
@@ -23,6 +23,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'stretch',
   },
+  calculatorNutritionalValue: {
+    marginBottom: 10,
+  },
 });
 
 class CalculatorScreen extends React.Component {
@@ -40,14 +43,13 @@ class CalculatorScreen extends React.Component {
   };
 
   getCalculatorNutritionalValue = () => {
-    const { getSelectedItems, props, state } = this;
+    const { getSelectedItemsData, props, state } = this;
     const { selectedItems } = state;
     const { dishes: dishesSource, products: productsSource } = props;
-    const dishes = getSelectedItems(dishesSource);
-    const products = getSelectedItems(productsSource);
+    const result = getSelectedItemsData({ ...dishesSource, ...productsSource }, selectedItems);
 
     return {
-      ingredients: dishes.concat(products),
+      ingredients: Object.values(result),
       selectedIngredients: selectedItems,
     };
   };
@@ -62,24 +64,32 @@ class CalculatorScreen extends React.Component {
     };
   };
 
-  getSelectedItems = (items) => {
-    const { selectedItems } = this.state;
+  getSelectedItemsData = (items, selectedItems) => selectedItems.reduce((accumulator, selectedItem) => {
+    const itemData = items[selectedItem.id];
+    let newItem = {};
+    const { ingredients } = itemData;
 
-    return selectedItems.reduce((result, selectedItem) => {
-      if (items[selectedItem.id]) {
-        return [
-          ...result,
-          ...[
-            {
-              ...items[selectedItem.id],
-              id: selectedItem.id,
-            },
-          ],
-        ];
+    if (itemData !== undefined) {
+      newItem[selectedItem.id] = {
+        ...itemData,
+        id: selectedItem.id,
+      };
+
+      if (ingredients !== undefined) {
+        newItem = {
+          ...newItem,
+          ...this.getSelectedItemsData(items, Object.values(ingredients)),
+        };
       }
-      return result;
-    }, []);
-  };
+
+      return {
+        ...accumulator,
+        ...newItem,
+      };
+    }
+
+    return accumulator;
+  }, {});
 
   itemsSelectorProps = () => {
     const {
@@ -141,7 +151,9 @@ class CalculatorScreen extends React.Component {
     });
   };
 
-  renderIngredientsEditor = () => (<IngredientsEditor {...this.getIngredientsEditorProps() } />);
+  renderIngredientsEditor = () => (<View style={styles.calculatorNutritionalValue}>
+    <IngredientsEditor {...this.getIngredientsEditorProps() } />
+  </View>);
 
   renderItemsSelector = () => {
     const { itemsSelectorProps } = this;
@@ -150,7 +162,12 @@ class CalculatorScreen extends React.Component {
     );
   };
 
-  renderNutritionalValue = () => <CalculatorNutritionalValue {...this.getCalculatorNutritionalValue()}/>;
+  renderNutritionalValue =
+    () => (
+      <View style={styles.calculatorNutritionalValue}>
+        <CalculatorNutritionalValue {...this.getCalculatorNutritionalValue()}/>
+      </View>
+    );
 
   renderSearchControl = () => {
     const { searchText } = this.state;

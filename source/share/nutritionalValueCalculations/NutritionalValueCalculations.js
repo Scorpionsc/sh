@@ -9,7 +9,6 @@ import palette from '../../palette/index';
 
 const styles = StyleSheet.create({
   dishCalculations: {
-    // flex: 1,
     flexDirection: 'row',
     backgroundColor: palette.color3,
     borderColor: palette.color5,
