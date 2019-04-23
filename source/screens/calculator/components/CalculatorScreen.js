@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  SafeAreaView, StyleSheet, ScrollView, View,
+  SafeAreaView, StyleSheet, ScrollView, View, RefreshControl,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import palette from '../../../palette/index';
@@ -8,6 +8,7 @@ import ItemsSelector from '../../../share/itemsSelector/ItemsSelector';
 import CalculatorNutritionalValue from './CalculatorNutritionalValue';
 import SearchControl from '../../../share/searchControl/SearchControl';
 import IngredientsEditor from '../../../share/ingredientsEditor/IngredientsEditor';
+import TreatmentInfo from '../../../share/treatmentInfo/TreatmentInfo';
 
 const styles = StyleSheet.create({
   calculator: {
@@ -33,14 +34,31 @@ class CalculatorScreen extends React.Component {
     user: PropTypes.object.isRequired,
     dishes: PropTypes.object.isRequired,
     products: PropTypes.object.isRequired,
+    bg: PropTypes.object,
+    treatments: PropTypes.array.isRequired,
+    isTreatmentsRefresh: PropTypes.bool.isRequired,
+    speed: PropTypes.object.isRequired,
+    iob: PropTypes.number.isRequired,
+    iog: PropTypes.number.isRequired,
+
+    refreshTreatments: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    bg: null,
   };
 
   static navigationOptions = { header: null };
 
-  state = {
-    selectedItems: [],
-    searchText: '',
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      selectedItems: [],
+      searchText: '',
+      refreshing: false,
+    };
+  }
 
   getCalculatorNutritionalValue = () => {
     const { getSelectedItemsData, props, state } = this;
@@ -64,32 +82,33 @@ class CalculatorScreen extends React.Component {
     };
   };
 
-  getSelectedItemsData = (items, selectedItems) => selectedItems.reduce((accumulator, selectedItem) => {
-    const itemData = items[selectedItem.id];
-    let newItem = {};
-    const { ingredients } = itemData;
+  getSelectedItemsData = (items, selectedItems) => selectedItems
+    .reduce((accumulator, selectedItem) => {
+      const itemData = items[selectedItem.id];
+      let newItem = {};
+      const { ingredients } = itemData;
 
-    if (itemData !== undefined) {
-      newItem[selectedItem.id] = {
-        ...itemData,
-        id: selectedItem.id,
-      };
+      if (itemData !== undefined) {
+        newItem[selectedItem.id] = {
+          ...itemData,
+          id: selectedItem.id,
+        };
 
-      if (ingredients !== undefined) {
-        newItem = {
+        if (ingredients !== undefined) {
+          newItem = {
+            ...newItem,
+            ...this.getSelectedItemsData(items, Object.values(ingredients)),
+          };
+        }
+
+        return {
+          ...accumulator,
           ...newItem,
-          ...this.getSelectedItemsData(items, Object.values(ingredients)),
         };
       }
 
-      return {
-        ...accumulator,
-        ...newItem,
-      };
-    }
-
-    return accumulator;
-  }, {});
+      return accumulator;
+    }, {});
 
   itemsSelectorProps = () => {
     const {
@@ -130,6 +149,14 @@ class CalculatorScreen extends React.Component {
     this.setState({
       selectedItems: selectedItems.filter(item => item.id !== ingredientKey),
     });
+  };
+
+  onRefresh = () => {
+    const { refreshTreatments } = this.props;
+
+    this.setState({ refreshing: true });
+
+    refreshTreatments();
   };
 
   onSearchTextChange = (searchText) => {
@@ -174,6 +201,12 @@ class CalculatorScreen extends React.Component {
     return <SearchControl searchText={searchText} onChangeText={this.onSearchTextChange}/>;
   };
 
+  renderTreatmentInfo = () => {
+    const { bg, iob, iog } = this.props;
+    return <TreatmentInfo
+      {...{ bg, iob, iog }}/>;
+  };
+
 
   render() {
     const {
@@ -181,11 +214,22 @@ class CalculatorScreen extends React.Component {
       renderItemsSelector,
       renderNutritionalValue,
       renderSearchControl,
+      renderTreatmentInfo,
+      props,
     } = this;
+    const { isTreatmentsRefresh } = props;
 
     return (
       <SafeAreaView style={[styles.calculator]}>
-        <ScrollView contentContainerStyle={styles.calculatorScroll}>
+        {renderTreatmentInfo()}
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={isTreatmentsRefresh}
+              onRefresh={this.onRefresh}
+            />
+          }
+          contentContainerStyle={styles.calculatorScroll}>
           {renderNutritionalValue()}
           {renderIngredientsEditor()}
           {renderItemsSelector()}

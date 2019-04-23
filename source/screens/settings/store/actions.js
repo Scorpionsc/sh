@@ -1,8 +1,8 @@
 import { AsyncStorage } from 'react-native';
 import firebase from 'react-native-firebase';
 
-export const SET_SPEED_REF = 'SET_PRODUCTS_REF';
-export const SET_SPEED = 'SET_PRODUCTS';
+export const SET_SPEED_REF = 'SET_SPEED_REF';
+export const SET_SPEED = 'SET_SPEED';
 
 const fetchLocalSpeed = async () => {
   const speed = await AsyncStorage.getItem('@SHStore:speed');
