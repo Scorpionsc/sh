@@ -25,6 +25,8 @@ class CalculatorNutritionalValue extends React.Component {
   };
 
   static defaultProps = {
+    ingredients: [],
+    selectedIngredients: [],
   };
 
 
@@ -71,7 +73,7 @@ class CalculatorNutritionalValue extends React.Component {
     }, {}) : result;
   };
 
-  getNutritionalValue = () => {
+  getNutritionalProps = () => {
     const { selectedIngredients } = this.props;
     const ingredients = selectedIngredients.map((selectedIngredient) => {
       const newData = this.getIngredientsData([selectedIngredient]);
@@ -101,13 +103,14 @@ class CalculatorNutritionalValue extends React.Component {
     };
   };
 
+
   render() {
-    const { getNutritionalValue } = this;
+    const { getNutritionalProps } = this;
 
 
     return (<View>
       <Text style={styles.nutritionalTitle}>The nutritional value</Text>
-      <NutritionalValueCalculations {...getNutritionalValue()} style={styles.nutritionalValues}/>
+      <NutritionalValueCalculations {...getNutritionalProps()} style={styles.nutritionalValues}/>
     </View>);
   }
 }

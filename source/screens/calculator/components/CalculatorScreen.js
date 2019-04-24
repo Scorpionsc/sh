@@ -9,6 +9,7 @@ import CalculatorNutritionalValue from './CalculatorNutritionalValue';
 import SearchControl from '../../../share/searchControl/SearchControl';
 import IngredientsEditor from '../../../share/ingredientsEditor/IngredientsEditor';
 import TreatmentInfo from '../../../share/treatmentInfo/TreatmentInfo';
+import Recommendations from "../../../share/Recommendations/Recommendations";
 
 const styles = StyleSheet.create({
   calculator: {
@@ -60,7 +61,7 @@ class CalculatorScreen extends React.Component {
     };
   }
 
-  getCalculatorNutritionalValue = () => {
+  getCalculatorNutritionalProps = () => {
     const { getSelectedItemsData, props, state } = this;
     const { selectedItems } = state;
     const { dishes: dishesSource, products: productsSource } = props;
@@ -192,9 +193,28 @@ class CalculatorScreen extends React.Component {
   renderNutritionalValue =
     () => (
       <View style={styles.calculatorNutritionalValue}>
-        <CalculatorNutritionalValue {...this.getCalculatorNutritionalValue()}/>
+        <CalculatorNutritionalValue {...this.getCalculatorNutritionalProps()}/>
       </View>
     );
+
+  renderRecommendations = () => {
+    const { getCalculatorNutritionalProps, props } = this;
+    const { bg, iob, iog, speed } = props;
+    const calculatorNutritionalProps = getCalculatorNutritionalProps();
+    const recommendationsProps = {
+      bg,
+      iob,
+      iog,
+      speed,
+      ...calculatorNutritionalProps,
+    };
+
+    return (
+      <View style={styles.calculatorNutritionalValue}>
+        <Recommendations {...recommendationsProps}/>
+      </View>
+    )
+  };
 
   renderSearchControl = () => {
     const { searchText } = this.state;
@@ -215,6 +235,7 @@ class CalculatorScreen extends React.Component {
       renderNutritionalValue,
       renderSearchControl,
       renderTreatmentInfo,
+      renderRecommendations,
       props,
     } = this;
     const { isTreatmentsRefresh } = props;
@@ -230,6 +251,7 @@ class CalculatorScreen extends React.Component {
             />
           }
           contentContainerStyle={styles.calculatorScroll}>
+          {renderRecommendations()}
           {renderNutritionalValue()}
           {renderIngredientsEditor()}
           {renderItemsSelector()}

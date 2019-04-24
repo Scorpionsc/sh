@@ -6,10 +6,12 @@ const initialState = {
       insulin: {
         top: 30,
         total: 240,
+        power: 170,
       },
       carbs: {
         top: 30,
         total: 240,
+        power: 30,
       },
     },
   },
