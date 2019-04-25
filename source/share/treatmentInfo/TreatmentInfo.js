@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import PropTypes from 'prop-types';
 import palette from '../../palette/index';
 
@@ -26,6 +26,8 @@ class TreatmentInfo extends React.Component {
     bg: PropTypes.object,
     iob: PropTypes.number.isRequired,
     iog: PropTypes.number.isRequired,
+
+    onSetBG: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -34,12 +36,21 @@ class TreatmentInfo extends React.Component {
 
   millisecondsToMinutes = time => time / 1000 / 60;
 
+  setBG = () => {
+    const { onSetBG } = this.props;
+    onSetBG();
+  };
+
   renderBG = () => {
     const { bg } = this.props;
 
     return bg
-      ? <Text style={styles.bg}>{this.props.bg.sgv}</Text>
-      : <Text style={styles.bg}>--</Text>;
+      ? (<TouchableWithoutFeedback onPress={this.setBG}>
+          <Text style={styles.bg}>{this.props.bg.sgv}</Text>
+      </TouchableWithoutFeedback>)
+      : (<TouchableWithoutFeedback onPress={this.setBG}>
+        <Text style={styles.bg}>--</Text>
+      </TouchableWithoutFeedback>);
   };
 
   renderBGUpdatedDiff = () => {

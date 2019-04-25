@@ -308,7 +308,7 @@ class ProductFabricScreen extends React.Component {
           ref={proteinsRef}
           value={product.proteins}
           required={true}
-          keyboardType={'number-pad'}
+          keyboardType={'decimal-pad'}
           onSubmitEditing={this.onProteinsSubmitEditing}
           onChangeText={this.onProteinsChanged}/>
         <TextField
@@ -316,7 +316,7 @@ class ProductFabricScreen extends React.Component {
           ref={fatsRef}
           value={product.fats}
           required={true}
-          keyboardType={'number-pad'}
+          keyboardType={'decimal-pad'}
           onSubmitEditing={this.onFatsSubmitEditing}
           onChangeText={this.onFatsChanged}/>
         <TextField
@@ -324,7 +324,7 @@ class ProductFabricScreen extends React.Component {
           ref={carbohydratesRef}
           value={product.carbohydrates}
           required={true}
-          keyboardType={'number-pad'}
+          keyboardType={'decimal-pad'}
           onSubmitEditing={this.onCarbohydratesSubmitEditing}
           onChangeText={this.onCarbohydratesChanged}/>
         <TextField
@@ -332,7 +332,7 @@ class ProductFabricScreen extends React.Component {
           ref={giRef}
           value={product.gi}
           required={true}
-          keyboardType={'number-pad'}
+          keyboardType={'decimal-pad'}
           onSubmitEditing={this.onGiSubmitEditing}
           onChangeText={this.onGiChanged}/>
         <TextField
@@ -356,28 +356,36 @@ class ProductFabricScreen extends React.Component {
         <View style={styles.productFabricViewRow}>
           <Text style={styles.productFabricViewRowTitle}>Calories:</Text>
           <View style={styles.productFabricViewValues}>
-            <Text style={styles.productFabricViewValue}>{this.calculateCalories(product)}</Text>
+            <Text style={styles.productFabricViewValue}>
+              {Math.round(this.calculateCalories(product))}
+              </Text>
             <Text style={styles.productFabricViewUnit}> kcal</Text>
           </View>
         </View>
         <View style={styles.productFabricViewRow}>
           <Text style={styles.productFabricViewRowTitle}>Proteins:</Text>
           <View style={styles.productFabricViewValues}>
-            <Text style={styles.productFabricViewValue}>{product.proteins}</Text>
+            <Text style={styles.productFabricViewValue}>
+              {parseFloat(product.proteins).toFixed(2)}
+              </Text>
             <Text style={styles.productFabricViewUnit}> g</Text>
           </View>
         </View>
         <View style={styles.productFabricViewRow}>
           <Text style={styles.productFabricViewRowTitle}>Fats:</Text>
           <View style={styles.productFabricViewValues}>
-            <Text style={styles.productFabricViewValue}>{product.fats}</Text>
+            <Text style={styles.productFabricViewValue}>
+              {parseFloat(product.fats).toFixed(2)}
+              </Text>
             <Text style={styles.productFabricViewUnit}> g</Text>
           </View>
         </View>
         <View style={styles.productFabricViewRow}>
           <Text style={styles.productFabricViewRowTitle}>Carbohydrates:</Text>
           <View style={styles.productFabricViewValues}>
-            <Text style={styles.productFabricViewValue}>{product.carbohydrates}</Text>
+            <Text style={styles.productFabricViewValue}>
+              {parseFloat(product.carbohydrates).toFixed(2)}
+              </Text>
             <Text style={styles.productFabricViewUnit}> g</Text>
           </View>
         </View>
@@ -467,8 +475,6 @@ class ProductFabricScreen extends React.Component {
 
   render() {
     const { mode } = this.state;
-
-    console.log(mode);
 
     return (
       <SafeAreaView style={styles.productFabric}>

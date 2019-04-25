@@ -3,6 +3,7 @@ import MLab from 'mlab-data-api';
 import { AsyncStorage } from 'react-native';
 
 export const SET_TREATMENTS_LIST = 'SET_TREATMENTS_LIST';
+export const SET_TREATMENTS_TO_ADD = 'SET_TREATMENTS_TO_ADD';
 export const SET_BG = 'SET_BG';
 export const SET_TREATMENTS_REFRESH = 'SET_TREATMENTS_REFRESH';
 
@@ -24,6 +25,10 @@ const setBG = bg => ({
 
 const setTreatmentsList = treatments => ({
   type: SET_TREATMENTS_LIST,
+  payload: treatments,
+});
+const setTreatmentsToAdd = treatments => ({
+  type: SET_TREATMENTS_TO_ADD,
   payload: treatments,
 });
 
@@ -54,6 +59,21 @@ const fetchDBTreatments = (dispatch) => {
     });
 };
 
+const fetchTreatmentsToAdd = async () => {
+  let treatmentsToAdd = await AsyncStorage.getItem('@SHStore:treatmentsToAdd');
+  if (treatmentsToAdd) {
+    treatmentsToAdd = JSON.parse(treatmentsToAdd);
+    const timeInMs = Date.now() - 14400000;
+    const newTreatments = treatmentsToAdd.filter(treatment => treatment.timestamp > timeInMs);
+    if (newTreatments.length !== treatmentsToAdd.length) {
+      await AsyncStorage.removeItem('@SHStore:treatmentsToAdd');
+      await AsyncStorage.setItem('@SHStore:treatmentsToAdd', JSON.stringify(newTreatments));
+    }
+    return newTreatments;
+  }
+  return [];
+};
+
 export const fetchTreatments = (dispatch) => {
   fetchLocalTreatments().then((localTreatments) => {
     console.info('Local Treatments fetched');
@@ -62,6 +82,9 @@ export const fetchTreatments = (dispatch) => {
       dispatch(setTreatmentsList(localTreatments));
     }
     fetchDBTreatments(dispatch);
+  });
+  fetchTreatmentsToAdd().then((treatments) => {
+    if (treatments) dispatch(setTreatmentsToAdd(treatments));
   });
 };
 
@@ -94,4 +117,14 @@ export const refreshTreatments = () => (dispatch) => {
   dispatch(setTreatmentsRefresh(true));
   fetchBG(dispatch);
   fetchTreatments(dispatch);
+};
+
+export const addTreatments = remains => (dispatch) => {
+  AsyncStorage.setItem('@SHStore:treatmentsToAdd', JSON.stringify(remains)).then(() => {
+    dispatch(setTreatmentsToAdd(remains));
+  });
+};
+
+export const updateBG = bg => (dispatch) => {
+  dispatch(setBG(bg));
 };

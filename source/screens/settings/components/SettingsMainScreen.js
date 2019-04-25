@@ -281,8 +281,6 @@ class SettingsMainScreen extends React.Component {
       const { setUser, user } = this.props;
       const { patient } = this.state;
 
-      console.log(user);
-
       setUser({
         ...user,
         justSignIn: false,

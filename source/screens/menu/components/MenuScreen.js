@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
   menuTitleWrap: {
     borderBottomWidth: 3,
     borderColor: palette.color5,
+    backgroundColor: palette.color3,
     paddingTop: 5,
     paddingBottom: 5,
   },

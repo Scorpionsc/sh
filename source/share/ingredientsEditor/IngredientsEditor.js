@@ -85,7 +85,7 @@ class IngredientsEditor extends Component {
             ref={ingredientRef}
             style={style}
             label={`${ingredient.title}(g):`}
-            keyboardType={'number-pad'}
+            keyboardType={'decimal-pad'}
             required={true}
             value={ingredient.weight}
             onChangeText={this.changeIngredientsWeight(ingredientKey)}

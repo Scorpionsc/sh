@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "eslint-config-airbnb": "^17.1.0",
-    "prop-types": "^15.6.2",
     "mlab-data-api": "^0.2.2",
+    "prop-types": "^15.6.2",
     "react": "16.6.0-alpha.8af6728",
     "react-native": "0.57.4",
     "react-native-firebase": "^5.1.0",
@@ -21,7 +21,8 @@
     "react-navigation": "^3.0.9",
     "react-redux": "^5.1.1",
     "redux": "^4.0.1",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",

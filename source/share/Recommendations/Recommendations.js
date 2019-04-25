@@ -1,11 +1,14 @@
 import React from 'react';
 import {
-  StyleSheet, Text, View,
+  StyleSheet, Text, View, Alert,
 } from 'react-native';
+import uuidv1 from 'uuid/v1';
+
 import PropTypes from 'prop-types';
 import palette from '../../palette';
 import TextField from '../textField/TextField';
 import RoundButton from '../roundButton/RoundButton';
+
 
 const styles = StyleSheet.create({
   recommendationsTitle: {
@@ -47,7 +50,6 @@ const styles = StyleSheet.create({
   },
 });
 
-
 class Recommendations extends React.Component {
   static propTypes = {
     ingredients: PropTypes.arrayOf(PropTypes.shape),
@@ -56,23 +58,57 @@ class Recommendations extends React.Component {
     iog: PropTypes.number.isRequired,
     bg: PropTypes.object,
     speed: PropTypes.object,
+
+    onAddTreatments: PropTypes.func,
   };
 
   static defaultProps = {
     ingredients: [],
     selectedIngredients: [],
     bg: null,
+
+    onAddTreatments: () => {},
   };
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    return {
+      ...prevState,
+      ...Recommendations.getFormattedState(nextProps, prevState),
+    };
+  }
 
-  ingredientsReducer = (calculations, selectedIngredient) => {
+  static getFormattedState = (nextProps, prevState) => {
+    const nutritionalData = Recommendations.getNutritionalData(nextProps);
+    const carbsWithGi = Recommendations.getCarbsWithGi(nutritionalData);
+    const gi = Recommendations.getGi(nutritionalData, carbsWithGi);
+    const foodInjection = Recommendations.getFoodInjection(nextProps.speed, carbsWithGi);
+    const toInjectCalculated = Recommendations.getInjectionRecommendations(
+      prevState.toInject,
+      foodInjection,
+      nextProps.iob,
+      nextProps.bg,
+      nextProps.speed,
+      nextProps.iog,
+    );
+
+    return {
+      gi,
+      carbsWithGi,
+      foodInjection,
+      toInjectCalculated,
+    };
+  };
+
+  static ingredientsReducer = ingredients => (calculations, selectedIngredient) => {
     const { weight, type, id } = selectedIngredient;
-    const { ingredients } = this.props;
     const currentIngredient = ingredients.find(item => item.id === id);
 
     const ingredient = (type === 'product')
       ? currentIngredient
-      : this.getIngredientsData(Object.values(currentIngredient.ingredients));
+      : Recommendations.getIngredientsData(
+        Object.values(currentIngredient.ingredients),
+        ingredients,
+      );
 
     return {
       carbohydrates: calculations.carbohydrates + ((ingredient.carbohydrates / 100) * weight),
@@ -82,7 +118,7 @@ class Recommendations extends React.Component {
     };
   };
 
-  getIngredientsData = (ingredients) => {
+  static getIngredientsData = (ingredients, ingredientsSource) => {
     let result = {
       proteins: 0,
       carbohydrates: 0,
@@ -92,7 +128,7 @@ class Recommendations extends React.Component {
 
     if (ingredients.length === 0) return result;
 
-    result = ingredients.reduce(this.ingredientsReducer, result);
+    result = ingredients.reduce(Recommendations.ingredientsReducer(ingredientsSource), result);
 
     const totalWeight = ingredients.reduce((weight, ingredient) => {
       const currentWeight = Number.isNaN(ingredient.weight) || ingredient.weight === ''
@@ -110,10 +146,21 @@ class Recommendations extends React.Component {
     }, {}) : result;
   };
 
-  getNutritionalProps = () => {
-    const { selectedIngredients } = this.props;
+  static getInjectionRecommendations = (toInject, foodInjection, iob, bg, speed, iog) => {
+    const { carbs: { power: carbsPower }, insulin: { power: insulinPower } } = speed;
+    const point = 90;
+
+    if (bg === null) return '';
+    const neededInsulin = ((bg.sgv - point) / insulinPower);
+    // const neededInsulin = ((bg.sgv - point) / insulinPower) + ((iog * carbsPower) / insulinPower);
+
+    return (foodInjection - (iob - neededInsulin)).toFixed(2).toString();
+  };
+
+  static getNutritionalData = (props) => {
+    const { selectedIngredients, ingredients: ingredientsSource } = props;
     const ingredients = selectedIngredients.map((selectedIngredient) => {
-      const newData = this.getIngredientsData([selectedIngredient]);
+      const newData = Recommendations.getIngredientsData([selectedIngredient], ingredientsSource);
       Object.keys(newData).forEach((itemKey) => {
         const weight = Number.isNaN(selectedIngredient.weight) || selectedIngredient.weight === ''
           ? 0
@@ -134,28 +181,52 @@ class Recommendations extends React.Component {
       : ingredients;
   };
 
-  renderCarbsWithGi = (nutritionalProps) => {
-    const carbsWithGi = nutritionalProps.reduce((carbs, item) => (carbs + (item.carbohydrates * (item.gi / 100))), 0);
+  static getGi = (nutritionalData, carbsWithGi) => {
+    const carbs = nutritionalData.reduce((result, item) => (result + item.carbohydrates), 0);
+    let gi = (carbsWithGi / carbs) * 100;
+
+    if (Number.isNaN(gi)) gi = 0;
+
+    return gi;
+  };
+
+  static getFoodInjection = (speed, carbsWithGi) => {
+    const { carbs: { power: carbsPower }, insulin: { power: insulinPower } } = speed;
+    return (carbsWithGi * carbsPower) / insulinPower;
+  };
+
+  static getCarbsWithGi = nutritionalData => nutritionalData
+    .reduce((carbs, item) => (carbs + (item.carbohydrates * (item.gi / 100))), 0);
+
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      toInjectCalculated: '',
+      toInjectTyped: null,
+    };
+  }
+
+
+  onValChange = (text) => {
+    this.setState({
+      toInjectTyped: text,
+    });
+  };
+
+  renderCarbsWithGi = () => {
+    const { carbsWithGi } = this.state;
 
     return (
-      <View style={styles.dishCalculationsItem}>
+      <View style={[styles.dishCalculationsItem, styles.dishCalculationsItemLook]}>
         <Text style={styles.dishCalculationsTitle}>Carbs with GI: {Math.round(carbsWithGi)}g</Text>
       </View>
     );
   };
 
-  renderGI = (nutritionalProps) => {
-    const { carbsWithGi, carbs } = nutritionalProps.reduce((result, item) => {
-      const carbsWithGI = (result.carbsWithGi + (item.carbohydrates * (item.gi / 100)));
-      const carbs = result.carbs + item.carbohydrates;
-      return {
-        carbsWithGi: carbsWithGI,
-        carbs,
-      };
-    }, { carbs: 0, carbsWithGi: 0 });
-    let gi = (carbsWithGi / carbs) * 100;
-
-    if (Number.isNaN(gi)) gi = 0;
+  renderGI = () => {
+    const { gi } = this.state;
 
     return (
       <View style={styles.dishCalculationsItem}>
@@ -164,46 +235,109 @@ class Recommendations extends React.Component {
     );
   };
 
-  renderFoodInjection = (nutritionalProps) => {
-    const { speed: { carbs: { power: carbsPower }, insulin: { power: insulinPower } } } = this.props;
-    const carbsWithGi = nutritionalProps.reduce((carbs, item) => (carbs + (item.carbohydrates * (item.gi / 100))), 0);
-    const toInject = (carbsWithGi * carbsPower) / insulinPower;
+  renderFoodInjection = () => {
+    const { foodInjection } = this.state;
 
     return (
       <View style={[styles.dishCalculationsItem, styles.dishCalculationsItemLook]}>
-        <Text style={styles.dishCalculationsTitle}>Food injection: {toInject.toFixed(2)}u</Text>
+        <Text style={styles.dishCalculationsTitle}>
+          Food injection: {foodInjection.toFixed(2)}u
+        </Text>
       </View>
     );
   };
 
+  renderControl = () => {
+    const { toInjectCalculated, toInjectTyped } = this.state;
+    const val = toInjectTyped !== null ? toInjectTyped : toInjectCalculated;
 
-  render() {
-    const {
-      getNutritionalProps, renderCarbsWithGi, renderFoodInjection, renderGI,
-    } = this;
-    const nutritionalProps = getNutritionalProps();
-
-
-
-    return (<View>
-      <Text style={styles.recommendationsTitle}>Recommendations:</Text>
-      <View style={styles.dishCalculations}>
-        {renderGI(nutritionalProps)}
-        {renderCarbsWithGi(nutritionalProps)}
-        {renderFoodInjection(nutritionalProps)}
-      </View>
+    return (
       <View style={styles.injectionWrap}>
         <TextField
           style={styles.textField}
           label={'Injection(u):'}
-          keyboardType={'number-pad'}
-          value={'0'}/>
+          keyboardType={'decimal-pad'}
+          value={val}
+          onChangeText={this.onValChange}/>
         <RoundButton
           style={styles.addButton}
           androidName={'md-add'}
           iosName={'ios-add'}
-          size={30}/>
+          size={30}
+          onPress={this.setRemains}/>
       </View>
+    );
+  };
+
+  checkTypedVal = (val) => {
+    if (Number.isNaN(val)) return null;
+    return Number.parseFloat(val);
+  };
+
+  setRemains = () => {
+    const { onAddTreatments } = this.props;
+
+    Alert.alert(
+      'New Remains',
+      'Do you want to add new remains?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            const { carbsWithGi, toInjectCalculated, toInjectTyped } = this.state;
+
+            let val = this.checkTypedVal(toInjectTyped !== null ? toInjectTyped : toInjectCalculated);
+
+            if (val !== null) {
+              const now = Date.now();
+              if (val < 0) val = 0;
+              const carbs = Number.parseFloat(carbsWithGi.toFixed(2));
+
+              if (val !== 0 || carbs !== 0) {
+                const result = {
+                  timestamp: now,
+                  eventType: '<none>',
+                  enteredBy: 'xdrip',
+                  uuid: uuidv1(),
+                  carbs,
+                  insulin: val,
+                  created_at: new Date(now).toISOString(),
+                };
+
+                onAddTreatments(result);
+              }
+            }
+          },
+        },
+      ],
+      {
+        cancelable: false,
+      },
+    );
+
+  };
+
+  render() {
+    const {
+      renderCarbsWithGi,
+      renderFoodInjection,
+      renderGI,
+      renderControl,
+    } = this;
+
+    return (<View>
+      <Text style={styles.recommendationsTitle}>Recommendations:</Text>
+      <View style={styles.dishCalculations}>
+        {renderGI()}
+        {renderCarbsWithGi()}
+        {renderFoodInjection()}
+      </View>
+      {renderControl()}
+
     </View>);
   }
 }

@@ -103,10 +103,24 @@ const fetchDBSpeed = (dispatch, localSpeed) => {
   speedRef.on('value', onSpeedSnapshot(dispatch, localSpeed, speedRef));
 };
 
+const updateSpeedBD = async (speed, getState) => {
+  const state = getState();
+  const { speedRef } = state.speedData;
+
+  return speedRef.set(speed);
+};
+
 export const fetchSpeed = (dispatch) => {
   fetchLocalSpeed().then((localSpeed) => {
-    console.log('Local Speed fetched');
+    console.info('Local Speed fetched');
     if (localSpeed) dispatch(setSpeed(localSpeed));
     fetchDBSpeed(dispatch, localSpeed);
+  });
+};
+
+export const updateSpeed = speed => (dispatch, getState) => {
+  updateSpeedLocal(speed).then(() => {
+    dispatch(setSpeed(speed));
+    updateSpeedBD(speed, getState).then();
   });
 };

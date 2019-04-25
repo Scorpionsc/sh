@@ -3,6 +3,7 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  RefreshControl,
   View,
 } from 'react-native';
 import PropTypes from 'prop-types';
@@ -21,8 +22,6 @@ const styles = StyleSheet.create({
   },
   dishFabricScroll: {
     padding: 20,
-    flex: 1,
-    alignSelf: 'stretch',
   },
   dishFabricLine: {
     borderTopWidth: 1,
@@ -120,6 +119,7 @@ class DishFabricScreen extends React.Component {
       mode: this.getModeFromNav(),
       giEdited: false,
       searchText: '',
+      isTreatmentsRefresh: false,
     };
 
     this.updateIngredientRefs();
@@ -228,6 +228,17 @@ class DishFabricScreen extends React.Component {
     }
   };
 
+  onRefresh = () => {
+    this.setState({
+      dish: {
+        ...this.state.dish,
+        gi: '',
+      },
+      isTreatmentsRefresh: false,
+      giEdited: false,
+    });
+  };
+
 
   addHeaderHandler = () => {
     const { navigation } = this.props;
@@ -311,8 +322,6 @@ class DishFabricScreen extends React.Component {
   };
 
   getIngredientsData = (ingredients) => {
-    console.log(ingredients);
-
     const ingredientsKeys = Object.keys(ingredients);
     let result = {
       proteins: 0,
@@ -453,7 +462,7 @@ class DishFabricScreen extends React.Component {
           ref={ingredientRef}
           style={style}
           label={`${ingredient.title}(g):`}
-          keyboardType={'number-pad'}
+          keyboardType={'decimal-pad'}
           required={true}
           value={ingredient.weight}
           onSubmitEditing={this.goToNextIngredient(index)}
@@ -505,11 +514,18 @@ class DishFabricScreen extends React.Component {
   }
 
   renderEditMode = () => {
-    const { dish } = this.state;
+    const { dish, isTreatmentsRefresh } = this.state;
 
     return (
       <View style={styles.dishFabricEdit}>
-        <ScrollView contentContainerStyle={styles.dishFabricScroll}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={isTreatmentsRefresh}
+              onRefresh={this.onRefresh}
+            />
+          }
+          contentContainerStyle={styles.dishFabricScroll}>
 
           {this.renderEditTexts()}
 

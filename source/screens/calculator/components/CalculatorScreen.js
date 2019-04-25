@@ -9,7 +9,8 @@ import CalculatorNutritionalValue from './CalculatorNutritionalValue';
 import SearchControl from '../../../share/searchControl/SearchControl';
 import IngredientsEditor from '../../../share/ingredientsEditor/IngredientsEditor';
 import TreatmentInfo from '../../../share/treatmentInfo/TreatmentInfo';
-import Recommendations from "../../../share/Recommendations/Recommendations";
+import Recommendations from '../../../share/Recommendations/Recommendations';
+import CalculatorBGModal from "./CalculatorBGModal";
 
 const styles = StyleSheet.create({
   calculator: {
@@ -22,8 +23,6 @@ const styles = StyleSheet.create({
   },
   calculatorScroll: {
     padding: 20,
-    flex: 1,
-    alignSelf: 'stretch',
   },
   calculatorNutritionalValue: {
     marginBottom: 10,
@@ -37,12 +36,15 @@ class CalculatorScreen extends React.Component {
     products: PropTypes.object.isRequired,
     bg: PropTypes.object,
     treatments: PropTypes.array.isRequired,
+    treatmentsToAdd: PropTypes.array.isRequired,
     isTreatmentsRefresh: PropTypes.bool.isRequired,
     speed: PropTypes.object.isRequired,
     iob: PropTypes.number.isRequired,
     iog: PropTypes.number.isRequired,
 
     refreshTreatments: PropTypes.func.isRequired,
+    addTreatments: PropTypes.func.isRequired,
+    updateBG: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -58,6 +60,7 @@ class CalculatorScreen extends React.Component {
       selectedItems: [],
       searchText: '',
       refreshing: false,
+      modalVisible: false,
     };
   }
 
@@ -136,6 +139,16 @@ class CalculatorScreen extends React.Component {
     type,
   }));
 
+  onAddRemains = (remains) => {
+    const { addTreatments, treatmentsToAdd } = this.props;
+    const timeInMs = Date.now() - 14400000;
+    const newTreatments = treatmentsToAdd.filter(treatment => treatment.timestamp > timeInMs);
+
+    newTreatments.push(remains);
+
+    addTreatments(newTreatments);
+  };
+
   onItemSelect = (itemToAdd) => {
     const { selectedItems } = this.state;
 
@@ -198,14 +211,17 @@ class CalculatorScreen extends React.Component {
     );
 
   renderRecommendations = () => {
-    const { getCalculatorNutritionalProps, props } = this;
-    const { bg, iob, iog, speed } = props;
+    const { getCalculatorNutritionalProps, props, onAddRemains } = this;
+    const {
+      bg, iob, iog, speed,
+    } = props;
     const calculatorNutritionalProps = getCalculatorNutritionalProps();
     const recommendationsProps = {
       bg,
       iob,
       iog,
       speed,
+      onAddTreatments: onAddRemains,
       ...calculatorNutritionalProps,
     };
 
@@ -213,7 +229,7 @@ class CalculatorScreen extends React.Component {
       <View style={styles.calculatorNutritionalValue}>
         <Recommendations {...recommendationsProps}/>
       </View>
-    )
+    );
   };
 
   renderSearchControl = () => {
@@ -223,8 +239,37 @@ class CalculatorScreen extends React.Component {
 
   renderTreatmentInfo = () => {
     const { bg, iob, iog } = this.props;
+    const treatmentInfoProps = {
+      onSetBG: this.setBG,
+      bg,
+      iob,
+      iog,
+    };
+
     return <TreatmentInfo
-      {...{ bg, iob, iog }}/>;
+      {...treatmentInfoProps}
+
+    />;
+  };
+
+  setBG = () => {
+    this.setState({
+      modalVisible: true,
+    });
+  };
+
+  closeModal = () => {
+    this.setState({
+      modalVisible: false,
+    });
+  };
+
+  saveBg = (bg) => {
+    this.props.updateBG(bg);
+
+    this.setState({
+      modalVisible: false,
+    });
   };
 
 
@@ -237,8 +282,10 @@ class CalculatorScreen extends React.Component {
       renderTreatmentInfo,
       renderRecommendations,
       props,
+      state,
     } = this;
     const { isTreatmentsRefresh } = props;
+    const { modalVisible } = state;
 
     return (
       <SafeAreaView style={[styles.calculator]}>
@@ -257,6 +304,10 @@ class CalculatorScreen extends React.Component {
           {renderItemsSelector()}
         </ScrollView>
         {renderSearchControl()}
+        <CalculatorBGModal
+          modalVisible={modalVisible}
+          closeModal={this.closeModal}
+          saveBg={this.saveBg}/>
       </SafeAreaView>
     );
   }

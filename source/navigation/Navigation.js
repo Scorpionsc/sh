@@ -15,6 +15,7 @@ import DishesScreenContainer from '../screens/dishes/containers/DishesScreenCont
 import MenusScreenContainer from '../screens/menu/containers/MenusScreenContainer';
 import ProductFabricScreenContainer from '../screens/products/containers/ProductFabricScreenContainer';
 import DishFabricScreenContainer from '../screens/dishes/containers/DishFabricScreenContainer';
+import SettingsSpeedScreenContainer from '../screens/settings/containers/SettingsSpeedScreenContainer';
 
 const defaultNavigationOptions = {
   headerStyle: {
@@ -93,6 +94,7 @@ FoodStack.navigationOptions = hideTabBar;
 const MoreStack = createStackNavigator({
   More: MoreScreenContainer,
   SettingsMain: SettingsMainScreenContainer,
+  SettingsSpeed: SettingsSpeedScreenContainer,
 },
 {
   defaultNavigationOptions,

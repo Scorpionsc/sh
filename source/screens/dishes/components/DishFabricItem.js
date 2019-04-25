@@ -58,7 +58,7 @@ class DishFabricItem extends React.Component {
       <TextField
         style={style}
         label={title}
-        keyboardType={'number-pad'}
+        keyboardType={'decimal-pad'}
         ref={fieldRef}
         required={true}
         value={weight.toString()}

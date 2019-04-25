@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import CalculatorScreen from '../components/CalculatorScreen';
-import { refreshTreatments } from '../../../store/treatments/actions';
+import { refreshTreatments, addTreatments, updateBG} from '../../../store/treatments/actions';
 
 const millisecondsToMinutes = time => time / 1000 / 60;
 
@@ -51,20 +51,34 @@ const getRemains = (speed, treatments) => {
   };
 };
 
-const mapStateToProps = state => ({
-  user: state.userData.user,
-  dishes: state.dishesData.dishes,
-  products: state.productsData.products,
-  speed: state.speedData.speed.common,
-  bg: state.treatments.bg,
-  treatments: state.treatments.data,
-  isTreatmentsRefresh: state.treatments.isRefresh,
-  ...getRemains(state.speedData.speed.common, state.treatments.data),
-});
+const mergeTreatments = (treatments, treatmentsToAdd) => {
+
+  if (treatmentsToAdd.length === 0) return treatments;
+  return treatments.concat(treatmentsToAdd);
+
+};
+
+const mapStateToProps = (state) => {
+  const treatments = mergeTreatments(state.treatments.data, state.treatments.toAdd);
+
+  return ({
+    user: state.userData.user,
+    dishes: state.dishesData.dishes,
+    products: state.productsData.products,
+    speed: state.speedData.speed.common,
+    bg: state.treatments.bg,
+    treatments,
+    treatmentsToAdd: state.treatments.toAdd,
+    isTreatmentsRefresh: state.treatments.isRefresh,
+    ...getRemains(state.speedData.speed.common, treatments),
+  });
+};
 
 
 const mapActionsToProps = dispatch => ({
   refreshTreatments: bindActionCreators(refreshTreatments, dispatch),
+  addTreatments: bindActionCreators(addTreatments, dispatch),
+  updateBG: bindActionCreators(updateBG, dispatch),
 });
 
 export default connect(mapStateToProps, mapActionsToProps, null, { withRef: true })(CalculatorScreen);

@@ -93,7 +93,7 @@ class DishFabricView extends React.Component {
       <View style={styles.dishFabricViewRow} key={key}>
         <Text style={styles.dishFabricViewRowTitle}>{title}:</Text>
         <View style={styles.dishFabricViewValues}>
-          <Text style={styles.dishFabricViewValue}>{value}</Text>
+          <Text style={styles.dishFabricViewValue}>{Math.round(value)}</Text>
           {
             unit
             && <Text style={styles.dishFabricViewUnit}>{unit}</Text>

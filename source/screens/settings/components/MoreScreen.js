@@ -12,7 +12,7 @@ class MoreScreen extends MenuScreen {
             },
             {
               title: 'Speed Settings',
-              route: 'SettingsMain',
+              route: 'SettingsSpeed',
             },
           ],
         },

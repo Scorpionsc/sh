@@ -1,16 +1,16 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { setUser, fetchUsers } from '../../store/user/actions';
-import SettingsMainScreen from '../components/SettingsMainScreen';
+import { updateSpeed } from '../store/actions';
+import SettingsSpeedScreen from '../components/SettingsSpeedScreen';
 
 const mapStateToProps = state => ({
-  speed: state.speed.settings,
+  speed: state.speedData.speed.common,
 });
 
 const mapActionsToProps = dispatch => (
   {
-    setNewSpeed: bindActionCreators(fetchUsers, dispatch),
+    updateSpeed: bindActionCreators(updateSpeed, dispatch),
   }
 );
 
-export default connect(mapStateToProps, mapActionsToProps)(SettingsMainScreen);
+export default connect(mapStateToProps, mapActionsToProps)(SettingsSpeedScreen);
