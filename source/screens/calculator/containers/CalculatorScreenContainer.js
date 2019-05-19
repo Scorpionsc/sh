@@ -37,11 +37,15 @@ const getRemains = (speed, treatments) => {
   const { insulin: insulinSpeed, carbs: carbsSpeed } = speed;
 
   const insulinTreatments = treatments
-    .filter(treatment => treatment.insulin > 0)
+    .filter(treatment => {
+      return treatment.insulin > 0
+    })
     .map(treatment => ({ date: treatment.timestamp, amount: treatment.insulin }));
+
   const carbsTreatments = treatments
     .filter(treatment => treatment.carbs > 0)
     .map(treatment => ({ date: treatment.timestamp, amount: treatment.carbs }));
+
   const iob = calculateTotalRemain(insulinSpeed, insulinTreatments);
   const iog = calculateTotalRemain(carbsSpeed, carbsTreatments);
 

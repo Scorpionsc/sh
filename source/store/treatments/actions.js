@@ -78,8 +78,12 @@ export const fetchTreatments = (dispatch) => {
   fetchLocalTreatments().then((localTreatments) => {
     console.info('Local Treatments fetched');
     if (localTreatments) {
+      const timeInMs = Date.now() - 14400000;
+      console.log(timeInMs);
+      console.log(localTreatments);
+      console.log(localTreatments.filter(tr => tr.timestamp > timeInMs));
       dispatch(setTreatmentsRefresh(false));
-      dispatch(setTreatmentsList(localTreatments));
+      dispatch(setTreatmentsList(localTreatments.filter(tr => tr.timestamp > timeInMs)));
     }
     fetchDBTreatments(dispatch);
   });
