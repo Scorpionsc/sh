@@ -14,10 +14,10 @@ class FoodScreen extends MenuScreen {
             title: 'Dishes',
             route: 'Dishes',
           },
-          {
-            title: 'Menus',
-            route: 'Menus',
-          },
+          // {
+          //   title: 'Menus',
+          //   route: 'Menus',
+          // },
         ],
       },
     ],

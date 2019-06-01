@@ -72,6 +72,7 @@ class DishFabricScreen extends React.Component {
 
     addDish: () => {
     },
+    handleEdit: () => {},
   };
 
   static navigationOptions = ({ navigation }) => {

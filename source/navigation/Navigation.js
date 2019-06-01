@@ -6,7 +6,6 @@ import palette from '../palette';
 
 import AuthLoadingScreenContainer from '../screens/auth/containers/AuthLoadingScreenContainer';
 import CalculatorScreenContainer from '../screens/calculator/containers/CalculatorScreenContainer';
-import HomeScreenContainer from '../screens/home/containers/HomeScreenContainer';
 import FoodScreenContainer from '../screens/food/containers/FoodScreenContainer';
 import MoreScreenContainer from '../screens/settings/containers/MoreScreenContainer';
 import SettingsMainScreenContainer from '../screens/settings/containers/SettingsMainScreenContainer';
@@ -34,9 +33,6 @@ const getTabBarIcon = (navigation, focused, tintColor) => {
   let iconName;
 
   switch (routeName) {
-    case 'Home':
-      iconName = Platform.OS === 'ios' ? 'ios-home' : 'md-home';
-      break;
     case 'Calculator':
       iconName = Platform.OS === 'ios' ? 'ios-calculator' : 'md-calculator';
       break;
@@ -62,14 +58,6 @@ const hideTabBar = ({ navigation }) => {
   };
 };
 
-const HomeStack = createStackNavigator({
-  Home: HomeScreenContainer,
-},
-{
-  defaultNavigationOptions,
-});
-HomeStack.navigationOptions = hideTabBar;
-
 const CalculatorStack = createStackNavigator({
   Calculator: CalculatorScreenContainer,
 },
@@ -89,7 +77,7 @@ const FoodStack = createStackNavigator({
 {
   defaultNavigationOptions,
 });
-FoodStack.navigationOptions = hideTabBar;
+// FoodStack.navigationOptions = hideTabBar;
 
 const MoreStack = createStackNavigator({
   More: MoreScreenContainer,
@@ -103,13 +91,12 @@ MoreStack.navigationOptions = hideTabBar;
 
 
 const BottomNavTabs = createBottomTabNavigator({
-  Home: HomeStack,
   Calculator: CalculatorStack,
   Food: FoodStack,
   More: MoreStack,
 },
 {
-  initialRouteName: 'Home',
+  initialRouteName: 'Calculator',
   defaultNavigationOptions: ({ navigation }) => ({
     tabBarIcon: ({ focused, tintColor }) => getTabBarIcon(navigation, focused, tintColor),
   }),

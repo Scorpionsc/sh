@@ -32,10 +32,10 @@ const styles = StyleSheet.create({
 class CalculatorScreen extends React.Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
-    dishes: PropTypes.object.isRequired,
-    products: PropTypes.object.isRequired,
+    dishes: PropTypes.object,
+    products: PropTypes.object,
     bg: PropTypes.object,
-    treatments: PropTypes.array.isRequired,
+    treatments: PropTypes.array,
     treatmentsToAdd: PropTypes.array.isRequired,
     isTreatmentsRefresh: PropTypes.bool.isRequired,
     speed: PropTypes.object.isRequired,
@@ -49,6 +49,9 @@ class CalculatorScreen extends React.Component {
 
   static defaultProps = {
     bg: null,
+    dishes: null,
+    products: null,
+    treatments: null,
   };
 
   static navigationOptions = { header: null };
@@ -125,6 +128,7 @@ class CalculatorScreen extends React.Component {
     const { dishes, products } = props;
     const { selectedItems, searchText } = state;
 
+    if(!dishes || products) return null;
     return {
       items: itemsToArray(dishes, 'dish').concat(itemsToArray(products, 'product')),
       selectedIds: selectedItems.map(item => item.id),
@@ -198,6 +202,7 @@ class CalculatorScreen extends React.Component {
 
   renderItemsSelector = () => {
     const { itemsSelectorProps } = this;
+
     return (
       <ItemsSelector {...itemsSelectorProps()}/>
     );
@@ -234,6 +239,7 @@ class CalculatorScreen extends React.Component {
 
   renderSearchControl = () => {
     const { searchText } = this.state;
+
     return <SearchControl searchText={searchText} onChangeText={this.onSearchTextChange}/>;
   };
 
@@ -245,7 +251,6 @@ class CalculatorScreen extends React.Component {
       iob,
       iog,
     };
-
     return <TreatmentInfo
       {...treatmentInfoProps}
 

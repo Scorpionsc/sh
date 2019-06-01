@@ -290,7 +290,7 @@ class SettingsMainScreen extends React.Component {
 
       this.resetNavigation();
 
-      this.props.navigation.navigate('Home');
+      this.props.navigation.navigate('Calculator');
     };
 
     subscribeBackButton = () => {

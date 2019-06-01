@@ -6,41 +6,6 @@ import PropTypes from 'prop-types';
 import palette from '../../../palette/index';
 import MenuItem from '../../../share/menuItem/MenuItem';
 
-class MenuScreen extends React.Component {
-    static propTypes = {
-      user: PropTypes.object.isRequired,
-    };
-
-    static navigationOptions = { header: null };
-
-
-    onItemClick = (itemData) => {
-      const { navigation } = this.props;
-
-      navigation.navigate(itemData.route, { backButton: true });
-    };
-
-    renderTitle = ({ section: { title } }) => (
-            <View style={[styles.menuTitleWrap]}>
-                <Text style={[styles.menuTitle]}>{title}</Text>
-            </View>
-    );
-
-
-    render() {
-      const { menuSections } = this.state;
-
-      return (
-            <SafeAreaView style={[styles.menu]}>
-                <SectionList style={[styles.menuList]} sections={menuSections}
-                             renderItem={({ item, index }) => <MenuItem key={index} data={item} onClick={this.onItemClick}/>}
-                             renderSectionHeader={this.renderTitle}
-                             keyExtractor={(item, index) => item + index}/>
-            </SafeAreaView>
-      );
-    }
-}
-
 const styles = StyleSheet.create({
   menu: {
     flex: 1,
@@ -68,5 +33,43 @@ const styles = StyleSheet.create({
   },
 
 });
+
+class MenuScreen extends React.Component {
+    static propTypes = {
+      user: PropTypes.object.isRequired,
+    };
+
+    static navigationOptions = { header: null };
+
+
+    onItemClick = (itemData) => {
+      const { navigation } = this.props;
+
+      navigation.navigate(itemData.route, { backButton: true });
+    };
+
+    renderTitle = ({ section: { title } }) => (
+            <View style={[styles.menuTitleWrap]}>
+                <Text style={[styles.menuTitle]}>{title}</Text>
+            </View>
+    );
+
+
+    render() {
+      const { menuSections } = this.state;
+
+      return (
+            <SafeAreaView style={[styles.menu]}>
+                <SectionList style={[styles.menuList]} sections={menuSections}
+                             renderItem={({ item, index }) => <MenuItem
+                                 key={index}
+                                 data={item}
+                                 onClick={this.onItemClick}/>}
+                             renderSectionHeader={this.renderTitle}
+                             keyExtractor={(item, index) => item + index}/>
+            </SafeAreaView>
+      );
+    }
+}
 
 export default MenuScreen;

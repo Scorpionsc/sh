@@ -3,6 +3,7 @@ import SearchFilterScreen from '../../../share/searchFilter/components/SearchFil
 import RoundButton from '../../../share/roundButton/RoundButton';
 
 class ProductsScreen extends SearchFilterScreen {
+
     static navigationOptions = ({ navigation }) => {
       const { params } = navigation.state;
 

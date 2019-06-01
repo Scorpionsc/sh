@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import CalculatorScreen from '../components/CalculatorScreen';
-import { refreshTreatments, addTreatments, updateBG} from '../../../store/treatments/actions';
+import { refreshTreatments, addTreatments, updateBG } from '../../../store/treatments/actions';
 
 const millisecondsToMinutes = time => time / 1000 / 60;
 
@@ -35,14 +35,11 @@ const calculateTotalRemain = (speed, items) => {
 
 const getRemains = (speed, treatments) => {
   const { insulin: insulinSpeed, carbs: carbsSpeed } = speed;
-
-  const insulinTreatments = treatments
-    .filter(treatment => {
-      return treatment.insulin > 0
-    })
+  const insulinTreatments = (treatments === null) ? [] : treatments
+    .filter(treatment => treatment.insulin > 0)
     .map(treatment => ({ date: treatment.timestamp, amount: treatment.insulin }));
 
-  const carbsTreatments = treatments
+  const carbsTreatments = (treatments === null) ? [] : treatments
     .filter(treatment => treatment.carbs > 0)
     .map(treatment => ({ date: treatment.timestamp, amount: treatment.carbs }));
 
@@ -56,10 +53,19 @@ const getRemains = (speed, treatments) => {
 };
 
 const mergeTreatments = (treatments, treatmentsToAdd) => {
+  const result = (treatmentsToAdd.length === 0)
+    ? treatments
+    : treatments.concat(treatmentsToAdd);
 
-  if (treatmentsToAdd.length === 0) return treatments;
-  return treatments.concat(treatmentsToAdd);
-
+  return result
+    ? result.reduce((acum, item) => {
+      const existedItem = acum.find(innerItem => innerItem.timestamp === item.timestamp
+              && innerItem.insulin === item.insulin
+              && innerItem.carbs === item.carbs);
+      if (!existedItem) acum.push(item);
+      return acum;
+    }, [])
+    : result;
 };
 
 const mapStateToProps = (state) => {
@@ -85,4 +91,9 @@ const mapActionsToProps = dispatch => ({
   updateBG: bindActionCreators(updateBG, dispatch),
 });
 
-export default connect(mapStateToProps, mapActionsToProps, null, { withRef: true })(CalculatorScreen);
+export default connect(
+  mapStateToProps,
+  mapActionsToProps,
+  null,
+  { withRef: true },
+)(CalculatorScreen);

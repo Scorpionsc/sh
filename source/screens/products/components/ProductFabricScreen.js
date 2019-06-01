@@ -102,6 +102,8 @@ class ProductFabricScreen extends React.Component {
     const mode = navigation.getParam('mode', 'add');
     const title = mode === 'add' ? 'Add product' : mode === 'edit' ? 'Edit product' : null;
 
+if(params.handleEdit === undefined ) params.handleEdit = () => {};
+
     return {
       title,
       tabBarVisible: false,
