@@ -43,10 +43,11 @@ class TreatmentInfo extends React.Component {
 
   renderBG = () => {
     const { bg } = this.props;
+    const convert = 18.0182;
 
     return bg
       ? (<TouchableWithoutFeedback onPress={this.setBG}>
-          <Text style={styles.bg}>{this.props.bg.sgv}</Text>
+          <Text style={styles.bg}>{(this.props.bg.sgv / convert).toFixed(1)}</Text>
       </TouchableWithoutFeedback>)
       : (<TouchableWithoutFeedback onPress={this.setBG}>
         <Text style={styles.bg}>--</Text>

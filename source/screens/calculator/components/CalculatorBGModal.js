@@ -56,15 +56,18 @@ class CalculatorBGModal extends React.Component {
 
   saveBg = () => {
     const { value } = this.state;
+    const convert = 18.0182;
+    const isNumber = !Number.isNaN(window.parseInt(value));
 
-    const result = Number.isNaN(window.parseInt(value))
-      ? null
-      : {
+    if (isNumber) {
+      const bg = value < 40 ? value * convert : value;
+      this.props.saveBg({
         date: Date.now(),
-        sgv: window.parseInt(value),
-      };
-
-    this.props.saveBg(result);
+        sgv: window.parseInt(bg),
+      });
+    } else {
+      this.props.saveBg(null);
+    }
   };
 
   onValChange = (text) => {

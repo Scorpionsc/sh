@@ -79,7 +79,7 @@ export const fetchTreatments = (dispatch) => {
     console.info('Local Treatments fetched');
     if (localTreatments) {
       const timeInMs = Date.now() - 14400000;
-      
+
       dispatch(setTreatmentsRefresh(false));
       dispatch(setTreatmentsList(localTreatments.filter(tr => tr.timestamp > timeInMs)));
     }
@@ -92,9 +92,10 @@ export const fetchTreatments = (dispatch) => {
 
 export const fetchBG = (dispatch) => {
   const timeInMs = Date.now() - 600000;
+
   const collectionConfig = {
     collection: 'entries',
-    query: { date: { $gt: timeInMs }, delta: { $exists: true } },
+    query: { date: { $gt: timeInMs }, device: 'xDrip-DexcomG5' },
   };
 
   mLab.listDocuments(collectionConfig)
@@ -109,9 +110,6 @@ export const fetchBG = (dispatch) => {
 
         dispatch(setBG({ date, sgv }));
       }
-    })
-    .catch((error) => {
-      console.error('error', error);
     });
 };
 

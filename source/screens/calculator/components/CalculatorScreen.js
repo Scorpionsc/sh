@@ -10,7 +10,7 @@ import SearchControl from '../../../share/searchControl/SearchControl';
 import IngredientsEditor from '../../../share/ingredientsEditor/IngredientsEditor';
 import TreatmentInfo from '../../../share/treatmentInfo/TreatmentInfo';
 import Recommendations from '../../../share/Recommendations/Recommendations';
-import CalculatorBGModal from "./CalculatorBGModal";
+import CalculatorBGModal from './CalculatorBGModal';
 
 const styles = StyleSheet.create({
   calculator: {
@@ -118,22 +118,16 @@ class CalculatorScreen extends React.Component {
     }, {});
 
   itemsSelectorProps = () => {
-    const {
-      itemsToArray,
-      props,
-      state,
-      onItemSelect,
-    } = this;
+    const { dishes, products } = this.props;
+    const { selectedItems, searchText } = this.state;
 
-    const { dishes, products } = props;
-    const { selectedItems, searchText } = state;
+    if (!dishes || !products) return null;
 
-    if(!dishes || products) return null;
     return {
-      items: itemsToArray(dishes, 'dish').concat(itemsToArray(products, 'product')),
+      items: this.itemsToArray(dishes, 'dish').concat(this.itemsToArray(products, 'product')),
       selectedIds: selectedItems.map(item => item.id),
       searchText,
-      onItemSelect,
+      onItemSelect: this.onItemSelect,
     };
   };
 
@@ -200,13 +194,9 @@ class CalculatorScreen extends React.Component {
     <IngredientsEditor {...this.getIngredientsEditorProps() } />
   </View>);
 
-  renderItemsSelector = () => {
-    const { itemsSelectorProps } = this;
-
-    return (
-      <ItemsSelector {...itemsSelectorProps()}/>
-    );
-  };
+  renderItemsSelector = () => (
+      <ItemsSelector {...this.itemsSelectorProps()}/>
+  );
 
   renderNutritionalValue =
     () => (
@@ -253,7 +243,6 @@ class CalculatorScreen extends React.Component {
     };
     return <TreatmentInfo
       {...treatmentInfoProps}
-
     />;
   };
 

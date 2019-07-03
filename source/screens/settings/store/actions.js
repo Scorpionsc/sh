@@ -24,12 +24,12 @@ const syncSpeed = async (localSpeed, dbSpeed) => {
   } if (!localSpeed) {
     return {
       localChanged: true,
-      products: dbSpeed,
+      speed: dbSpeed,
     };
   } if (!dbSpeed) {
     return {
       dbChanged: true,
-      products: localSpeed,
+      speed: localSpeed,
     };
   }
 
@@ -67,7 +67,7 @@ const syncSpeed = async (localSpeed, dbSpeed) => {
     return {
       dbChanged: true,
       localChanged: true,
-      products: newSpeed,
+      speed: newSpeed,
     };
   }
   return null;
@@ -77,6 +77,7 @@ const updateSpeedLocal = async speed => AsyncStorage.setItem('@SHStore:speed', J
 
 const onSpeedSnapshot = (dispatch, localSpeed, speedRef) => (snapshot) => {
   const dbSpeed = snapshot.val();
+  console.info('DB Speed fetched');
 
   syncSpeed(localSpeed, dbSpeed).then((data) => {
     if (data) {
