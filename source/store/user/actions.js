@@ -9,68 +9,20 @@ export const SET_USER_REF = 'SET_USER_REF';
 export const SET_USERS_REF = 'SET_USERS_REF';
 export const SET_JUST_REGISTER = 'SET_JUST_REGISTER';
 
-
-export const fetchUser = async (dispatch) => {
-  const localUser = await fetchLocalUser();
-
-  if (!localUser.justSignIn) {
-    dispatch(setUser(localUser));
-  }
-
-  subscribeDBUser(localUser, dispatch);
-
-  return localUser;
-};
-
-export const fetchUsers = () => (dispatch) => {
-  dispatch(setUsersLoading(true));
-
-  fetchLocalUsers().then((users) => {
-    if (users) {
-      dispatch(setUsers(users));
-      dispatch(setUsersLoading(false));
-    }
-
-    subscribeDBUsers(users, dispatch);
-  });
-};
-
-export const setUser = user => ({
-  type: SET_USER,
-  payload: user,
-});
-
-export const setUsers = users => ({
-  type: SET_USERS,
-  payload: users,
-});
-
-
-const fetchLocalUser = async () => {
-  let user = await AsyncStorage.getItem('@SHStore:user');
-
-  if (!user) {
-    user = await googleSignIn();
-    user.justSignIn = true;
-    await AsyncStorage.setItem('@SHStore:user', JSON.stringify(user));
-  } else {
-    user = JSON.parse(user);
-  }
-
-  return user;
-};
-
-const fetchLocalUsers = async () => await AsyncStorage.getItem('@SHStore:users');
-
 const googleSignIn = async () => {
   try {
     await GoogleSignin.configure();
 
-    const data = await GoogleSignin.signIn();
+    const data = await GoogleSignin.signIn().catch(err => {
+      console.log(err);
+    });
 
     const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken);
 
-    const currentUser = await firebase.auth().signInWithCredential(credential);
+    const currentUser = await firebase.auth().signInWithCredential(credential).catch(err => {
+      console.log(err);
+    });
+    console.log(700);
 
     if (currentUser) {
       const {
@@ -99,6 +51,63 @@ const googleSignIn = async () => {
     }
   }
 };
+
+const fetchLocalUser = async () => {
+  let user = await AsyncStorage.getItem('@SHStore:user');
+
+  if (!user) {
+    user = await googleSignIn();
+    user.justSignIn = true;
+    await AsyncStorage.setItem('@SHStore:user', JSON.stringify(user));
+  } else {
+    user = JSON.parse(user);
+  }
+
+  return user;
+};
+
+export const setUser = user => ({
+  type: SET_USER,
+  payload: user,
+});
+
+export const setUsers = users => ({
+  type: SET_USERS,
+  payload: users,
+});
+
+export const fetchUser = async (dispatch) => {
+  const localUser = await fetchLocalUser();
+
+  if (!localUser.justSignIn) {
+    dispatch(setUser(localUser));
+  }
+
+  subscribeDBUser(localUser, dispatch);
+
+  return localUser;
+};
+
+export const fetchUsers = () => (dispatch) => {
+  dispatch(setUsersLoading(true));
+
+  fetchLocalUsers().then((users) => {
+    if (users) {
+      dispatch(setUsers(users));
+      dispatch(setUsersLoading(false));
+    }
+
+    subscribeDBUsers(users, dispatch);
+  });
+};
+
+
+
+
+
+
+const fetchLocalUsers = async () => await AsyncStorage.getItem('@SHStore:users');
+
 
 const onUserSnapshot = (localUser, userRef, dispatch) => (snapshot) => {
   const dbUser = snapshot.val();
